@@ -1,0 +1,35 @@
+// Map configuration constants
+import { Region } from '../types/map.types';
+
+export const QUEENSLAND_REGION: Region = {
+  latitude: -27.4698,
+  longitude: 153.0251,
+  latitudeDelta: 10.0,
+  longitudeDelta: 10.0,
+};
+
+export const BRISBANE_REGION: Region = {
+  latitude: -27.4698,
+  longitude: 153.0251,
+  latitudeDelta: 0.5,
+  longitudeDelta: 0.5,
+};
+
+export const MAP_ZOOM_LEVELS = {
+  LGA: {
+    min: 6,
+    max: 8,
+    default: 7,
+  },
+  SUBURB: {
+    min: 9,
+    max: 12,
+    default: 10,
+  },
+} as const;
+
+export const TILE_CONFIG = {
+  maximumZ: 12,
+  minimumZ: 6,
+  opacity: 0.8,
+} as const;
