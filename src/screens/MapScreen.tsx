@@ -3,11 +3,15 @@ import React from 'react';
 import { StyleSheet, View, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { UniversalMap } from '../components/Map/UniversalMap';
-import { LevelSwitch } from '../components/Map/LevelSwitch';
-import { ConnectionStatus } from '../components/UI/ConnectionStatus';
-import { MapProviderSwitch } from '../components/UI/MapProviderSwitch';
+
+import { Legend } from '../components/UI/Legend';
+import { LayerSelector } from '../components/UI/LayerSelector';
+import { TouchableOpacity, Text } from 'react-native';
+import { useState } from 'react';
 
 export const MapScreen: React.FC = () => {
+  const [selectorOpen, setSelectorOpen] = useState(false);
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
@@ -17,9 +21,13 @@ export const MapScreen: React.FC = () => {
         
         {/* Map controls overlay */}
         <View style={styles.controlsOverlay}>
-          <ConnectionStatus style={styles.connectionStatus} showDetails={false} />
-          <LevelSwitch style={styles.levelSwitch} />
-          <MapProviderSwitch style={styles.mapProviderSwitch} />
+          <TouchableOpacity style={styles.selectorButton} onPress={() => setSelectorOpen(v => !v)}>
+            <Text style={styles.selectorButtonText}>图层</Text>
+          </TouchableOpacity>
+          {selectorOpen && (
+            <LayerSelector style={styles.selectorPanel} onSelected={() => setSelectorOpen(false)} />
+          )}
+          <Legend style={styles.legend} />
         </View>
       </View>
     </SafeAreaView>
@@ -43,22 +51,28 @@ const styles = StyleSheet.create({
     bottom: 0,
     pointerEvents: 'box-none', // Allow touches to pass through to map
   },
-  connectionStatus: {
+  selectorButton: {
     position: 'absolute',
-    top: 20,
-    left: 16,
-    minWidth: 120,
-  },
-  levelSwitch: {
-    position: 'absolute',
-    top: 20,
+    top: 16,
     right: 16,
-    minWidth: 120,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    borderRadius: 18,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
   },
-  mapProviderSwitch: {
+  selectorButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#333',
+  },
+  selectorPanel: {
     position: 'absolute',
-    bottom: 100,
+    top: 56,
     right: 16,
-    minWidth: 200,
   },
+  legend: {
+    position: 'absolute',
+    bottom: 24,
+    right: 16,
+  }
 });

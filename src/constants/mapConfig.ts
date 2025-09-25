@@ -32,6 +32,8 @@ export const TILE_CONFIG = {
   maximumZ: 12,
   minimumZ: 6,
   opacity: 0.8,
+  cacheMaxAgeSec: 60 * 60 * 24 * 7, // 7 days
+  cacheNamespace: 'clisapp_tile_cache',
 } as const;
 
 // OpenStreetMap tile server configuration
@@ -48,3 +50,19 @@ export const OSM_TILE_SERVERS = {
 } as const;
 
 export const DEFAULT_OSM_TILE_SERVER = OSM_TILE_SERVERS.cartodb_light;
+
+// Australia bounds (approx)
+export const AUSTRALIA_BOUNDS = {
+  north: -10.0,
+  south: -44.0,
+  west: 112.0,
+  east: 154.0,
+} as const;
+
+// Queensland bounds (used for clamping map interactions)
+export const QUEENSLAND_BOUNDS = {
+  north: -9.0,
+  south: -29.0,
+  west: 138.0,
+  east: 154.0,
+} as const;
