@@ -14,7 +14,6 @@ import {
   useColorScheme,
   View,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import {
   SafeAreaProvider,
