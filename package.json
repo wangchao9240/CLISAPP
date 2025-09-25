@@ -4,24 +4,31 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
-    "ios": "react-native run-ios",
+    "ios": "npx react-native run-ios --simulator=\"iPhone 16 Pro\"",
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.19.0",
+    "@react-navigation/native": "^6.1.7",
+    "@react-navigation/stack": "^6.3.17",
     "react": "19.1.0",
     "react-native": "0.81.1",
-    "@react-native/new-app-screen": "0.81.1",
-    "react-native-safe-area-context": "^5.5.2",
+    "react-native-config": "^1.5.1",
+    "react-native-geolocation-service": "^5.3.1",
+    "react-native-gesture-handler": "^2.12.1",
     "react-native-maps": "^1.18.0",
-    "zustand": "^4.5.7",
-    "react-native-config": "^1.5.1"
+    "react-native-permissions": "^3.9.3",
+    "react-native-safe-area-context": "^5.5.2",
+    "react-native-screens": "^3.22.1",
+    "react-native-svg": "^14.1.0",
+    "zustand": "^4.5.7"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/preset-env": "^7.25.3",
-    "@babel/runtime": "^7.25.0",
+    "@babel/runtime": "^7.28.4",
     "@react-native-community/cli": "20.0.0",
     "@react-native-community/cli-platform-android": "20.0.0",
     "@react-native-community/cli-platform-ios": "20.0.0",
@@ -37,6 +44,9 @@
     "prettier": "2.8.8",
     "react-test-renderer": "19.1.0",
     "typescript": "^5.8.3"
+  },
+  "jest": {
+    "preset": "react-native"
   },
   "engines": {
     "node": ">=20"
