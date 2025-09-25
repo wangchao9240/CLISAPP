@@ -4,12 +4,12 @@ const isDevelopment = __DEV__;
 export const API_CONFIG = {
   // Backend base URL
   BASE_URL: isDevelopment 
-    ? 'http://localhost:8080'
+    ? 'http://localhost:8000'
     : 'https://clisapp-api.qut.edu.au',
     
-  // Tile server configuration (using backend API)
+  // Tile server configuration (using Phase 0 tile server)
   TILE_SERVER_URL: isDevelopment 
-    ? 'http://localhost:8080/api/v1/tiles'
+    ? 'http://localhost:8000/tiles'
     : 'https://clisapp-api.qut.edu.au/api/v1/tiles',
     
   // API timeouts
@@ -26,17 +26,17 @@ export const API_CONFIG = {
 // Google Maps API key (should be set in native configuration)
 export const GOOGLE_MAPS_API_KEY = 'your_google_maps_api_key_here';
 
-// Backend API endpoints (now connected to real backend)
+// Backend API endpoints (Phase 0 tile server)
 export const API_ENDPOINTS = {
-  // Health check
-  HEALTH: '/api/v1/health',
-  HEALTH_DETAILED: '/api/v1/health/detailed',
+  // Health check (Phase 0 format)
+  HEALTH: '/health',
+  HEALTH_DETAILED: '/health', // Phase 0 only has basic health
   
-  // Tile endpoints
-  TILES: '/api/v1/tiles',
-  TILE_STATUS: '/api/v1/tiles/status',
+  // Tile endpoints (Phase 0 format)
+  TILES: '/tiles',
+  TILE_STATUS: '/tiles/pm25/info', // Phase 0 tile info endpoint
   
-  // Region endpoints
+  // Region endpoints (not available in Phase 0, for future use)
   REGIONS_SEARCH: '/api/v1/regions/search',
   REGIONS_INFO: '/api/v1/regions',
   REGIONS_CLIMATE: '/api/v1/regions/climate',

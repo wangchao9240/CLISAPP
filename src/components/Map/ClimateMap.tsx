@@ -40,7 +40,8 @@ export const ClimateMap: React.FC<ClimateMapProps> = ({
   }, [setError]);
 
   // Generate tile URL template
-  const tileUrlTemplate = `${tileServerUrl}/${activeLayer}/${mapLevel}/{z}/{x}/{y}.png`;
+  // Phase 0 tile server format: /tiles/pm25/{z}/{x}/{y}.png (no mapLevel)
+  const tileUrlTemplate = `${tileServerUrl}/${activeLayer}/{z}/{x}/{y}.png`;
 
   useEffect(() => {
     // Reset loading state when layer or level changes

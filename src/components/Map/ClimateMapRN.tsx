@@ -56,10 +56,11 @@ export const ClimateMapRN: React.FC<ClimateMapRNProps> = ({
     console.log('Map pressed at:', coordinate);
   }, []);
 
-  // Generate tile URL template using backend API
+  // Generate tile URL template for Phase 0 tile server
+  // Phase 0 format: http://localhost:8000/tiles/pm25/{z}/{x}/{y}.png
   const tileUrlTemplate = mapProvider ? 
-    (mapProvider as any).getTileUrl?.() || `${tileServerUrl}/${activeLayer}/${mapLevel}/{z}/{x}/{y}.png` :
-    `${tileServerUrl}/${activeLayer}/${mapLevel}/{z}/{x}/{y}.png`;
+    (mapProvider as any).getTileUrl?.() || `${tileServerUrl}/${activeLayer}/{z}/{x}/{y}.png` :
+    `${tileServerUrl}/${activeLayer}/{z}/{x}/{y}.png`;
 
   useEffect(() => {
     // Reset loading state when layer or level changes

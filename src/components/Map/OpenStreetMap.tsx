@@ -42,8 +42,8 @@ export const OpenStreetMap: React.FC<OpenStreetMapProps> = ({
     setError('Failed to load map data');
   }, [setError]);
 
-  // Generate climate data tile URL template (from our backend)
-  const climateTileUrl = `${tileServerUrl}/${activeLayer}/${mapLevel}/{z}/{x}/{y}.png`;
+  // Generate climate data tile URL template (Phase 0 format: no mapLevel)
+  const climateTileUrl = `${tileServerUrl}/${activeLayer}/{z}/{x}/{y}.png`;
 
   useEffect(() => {
     // Reset loading state when layer or level changes

@@ -39,4 +39,4 @@ export const CLIMATE_LAYERS: Record<ClimateLayer, ClimateDataConfig> = {
   },
 };
 
-export const DEFAULT_LAYER: ClimateLayer = 'temperature';
+export const DEFAULT_LAYER: ClimateLayer = 'pm25';
