@@ -1,6 +1,7 @@
 // Main map screen implementing FR-001 and FR-002
 import React from 'react';
-import { StyleSheet, View, SafeAreaView, StatusBar } from 'react-native';
+import { StyleSheet, View, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { UniversalMap } from '../components/Map/UniversalMap';
 import { LevelSwitch } from '../components/Map/LevelSwitch';
 import { ConnectionStatus } from '../components/UI/ConnectionStatus';
