@@ -23,8 +23,10 @@ export const API_CONFIG = {
   LOG_LEVEL: isDevelopment ? 'debug' : 'error',
 } as const;
 
-// Google Maps API key (should be set in native configuration)
-export const GOOGLE_MAPS_API_KEY = 'your_google_maps_api_key_here';
+// Google Maps API key (configured in native platforms)
+// iOS: ios/CLISApp/Info.plist -> GMSApiKey
+// Android: android/app/src/main/AndroidManifest.xml -> com.google.android.geo.API_KEY
+export const GOOGLE_MAPS_API_KEY = 'configured_in_native_platforms';
 
 // Backend API endpoints (now connected to real backend)
 export const API_ENDPOINTS = {
