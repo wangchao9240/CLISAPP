@@ -1,6 +1,10 @@
-// Development component for switching map providers
+/**
+ * Map Provider Switch Component
+ * Allows switching between different map providers
+ */
+
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSettingsStore } from '../../store/settingsStore';
 
 interface MapProviderSwitchProps {
@@ -10,58 +14,48 @@ interface MapProviderSwitchProps {
 export const MapProviderSwitch: React.FC<MapProviderSwitchProps> = ({ style }) => {
   const { mapProvider, setMapProvider } = useSettingsStore();
 
-  const handleProviderChange = (provider: 'react-native-maps' | 'maplibre') => {
-    if (provider !== mapProvider) {
-      setMapProvider(provider);
-    }
+  const providers = [
+    { id: 'openstreetmap', name: 'OSM', description: 'Free & Open' },
+    { id: 'react-native-maps', name: 'Native', description: 'Platform Maps' },
+    { id: 'maplibre', name: 'LibreGL', description: 'Vector Maps' },
+  ] as const;
+
+  const handleProviderChange = (provider: typeof providers[number]['id']) => {
+    setMapProvider(provider);
   };
 
   return (
     <View style={[styles.container, style]}>
-      <Text style={styles.label}>Map Provider</Text>
+      <Text style={styles.label}>Map Style</Text>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[
-            styles.button,
-            styles.leftButton,
-            mapProvider === 'react-native-maps' && styles.activeButton,
-          ]}
-          onPress={() => handleProviderChange('react-native-maps')}
-        >
-          <Text
+        {providers.map((provider) => (
+          <TouchableOpacity
+            key={provider.id}
             style={[
-              styles.buttonText,
-              mapProvider === 'react-native-maps' && styles.activeButtonText,
+              styles.button,
+              mapProvider === provider.id && styles.activeButton,
             ]}
+            onPress={() => handleProviderChange(provider.id)}
           >
-            RN Maps
-          </Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={[
-            styles.button,
-            styles.rightButton,
-            mapProvider === 'maplibre' && styles.activeButton,
-          ]}
-          onPress={() => handleProviderChange('maplibre')}
-        >
-          <Text
-            style={[
-              styles.buttonText,
-              mapProvider === 'maplibre' && styles.activeButtonText,
-            ]}
-          >
-            MapLibre
-          </Text>
-        </TouchableOpacity>
+            <Text
+              style={[
+                styles.buttonText,
+                mapProvider === provider.id && styles.activeButtonText,
+              ]}
+            >
+              {provider.name}
+            </Text>
+            <Text
+              style={[
+                styles.descriptionText,
+                mapProvider === provider.id && styles.activeDescriptionText,
+              ]}
+            >
+              {provider.description}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
-      
-      {mapProvider === 'maplibre' && (
-        <Text style={styles.warning}>
-          ⚠️ MapLibre implementation coming soon
-        </Text>
-      )}
     </View>
   );
 };
@@ -98,34 +92,32 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingHorizontal: 8,
     backgroundColor: '#f8f9fa',
-  },
-  leftButton: {
-    borderRightWidth: 0.5,
+    alignItems: 'center',
+    borderRightWidth: 1,
     borderRightColor: '#ddd',
-  },
-  rightButton: {
-    borderLeftWidth: 0.5,
-    borderLeftColor: '#ddd',
   },
   activeButton: {
     backgroundColor: '#007AFF',
   },
   buttonText: {
-    textAlign: 'center',
     fontSize: 12,
     fontWeight: '500',
     color: '#333',
+    textAlign: 'center',
   },
   activeButtonText: {
     color: '#fff',
     fontWeight: '600',
   },
-  warning: {
-    fontSize: 10,
-    color: '#ff9500',
+  descriptionText: {
+    fontSize: 9,
+    color: '#888',
     textAlign: 'center',
-    marginTop: 4,
+    marginTop: 2,
+  },
+  activeDescriptionText: {
+    color: '#ccc',
   },
 });

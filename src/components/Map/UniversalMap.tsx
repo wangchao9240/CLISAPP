@@ -9,6 +9,9 @@ import { Region } from '../../types/map.types';
 // React Native Maps implementation
 import { ClimateMapRN } from './ClimateMapRN';
 
+// OpenStreetMap implementation (free alternative)
+import { OpenStreetMap } from './OpenStreetMap';
+
 // MapLibre implementation (placeholder for future)
 // import { ClimateMapLibre } from './ClimateMapLibre';
 
@@ -78,6 +81,14 @@ export const UniversalMap: React.FC<UniversalMapProps> = ({
           />
         );
       
+      case 'openstreetmap':
+        return (
+          <OpenStreetMap 
+            onRegionChange={onRegionChange}
+            style={style}
+          />
+        );
+      
       case 'maplibre':
         // Future implementation
         // return <ClimateMapLibre {...props} />;
@@ -88,11 +99,11 @@ export const UniversalMap: React.FC<UniversalMapProps> = ({
         );
       
       default:
+        // Default to OpenStreetMap (free option)
         return (
-          <ClimateMapRN 
+          <OpenStreetMap 
             onRegionChange={onRegionChange}
             style={style}
-            mapProvider={mapProviderRef.current}
           />
         );
     }

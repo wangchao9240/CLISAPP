@@ -11,7 +11,7 @@ interface SettingsState {
   maxCacheSize: number; // in MB
   
   // Map provider configuration
-  mapProvider: 'react-native-maps' | 'maplibre';
+  mapProvider: 'react-native-maps' | 'openstreetmap' | 'maplibre';
   
   // API configuration
   tileServerUrl: string;
@@ -22,7 +22,7 @@ interface SettingsState {
   setLocationServices: (enabled: boolean) => void;
   setCacheEnabled: (enabled: boolean) => void;
   setMaxCacheSize: (size: number) => void;
-  setMapProvider: (provider: 'react-native-maps' | 'maplibre') => void;
+  setMapProvider: (provider: 'react-native-maps' | 'openstreetmap' | 'maplibre') => void;
   setTileServerUrl: (url: string) => void;
   setApiTimeout: (timeout: number) => void;
   resetSettings: () => void;
@@ -33,7 +33,7 @@ const defaultSettings = {
   enableLocationServices: true,
   cacheEnabled: true,
   maxCacheSize: 100, // 100MB
-  mapProvider: 'react-native-maps' as const,
+  mapProvider: 'openstreetmap' as const,
   tileServerUrl: __DEV__ ? 'http://localhost:8080/api/v1/tiles' : 'https://clisapp-api.qut.edu.au/api/v1/tiles',
   apiTimeout: 10000, // 10 seconds
 };

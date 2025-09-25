@@ -32,9 +32,7 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>CLISApp needs location access to show climate data for your area</string>
-	<key>GMSApiKey</key>
-	<string>YOUR_GOOGLE_MAPS_API_KEY_HERE</string>
+	<string></string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

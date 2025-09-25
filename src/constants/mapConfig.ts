@@ -33,3 +33,18 @@ export const TILE_CONFIG = {
   minimumZ: 6,
   opacity: 0.8,
 } as const;
+
+// OpenStreetMap tile server configuration
+export const OSM_TILE_SERVERS = {
+  // Standard OpenStreetMap tiles
+  standard: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  
+  // Alternative OSM tile servers for load balancing
+  cartodb_light: 'https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
+  cartodb_dark: 'https://cartodb-basemaps-a.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
+  
+  // OpenTopoMap for topographic view
+  topo: 'https://tile.opentopomap.org/{z}/{x}/{y}.png',
+} as const;
+
+export const DEFAULT_OSM_TILE_SERVER = OSM_TILE_SERVERS.cartodb_light;

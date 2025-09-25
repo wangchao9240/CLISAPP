@@ -4,6 +4,7 @@ import { StyleSheet, View, SafeAreaView, StatusBar } from 'react-native';
 import { UniversalMap } from '../components/Map/UniversalMap';
 import { LevelSwitch } from '../components/Map/LevelSwitch';
 import { ConnectionStatus } from '../components/UI/ConnectionStatus';
+import { MapProviderSwitch } from '../components/UI/MapProviderSwitch';
 
 export const MapScreen: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ export const MapScreen: React.FC = () => {
         <View style={styles.controlsOverlay}>
           <ConnectionStatus style={styles.connectionStatus} showDetails={false} />
           <LevelSwitch style={styles.levelSwitch} />
+          <MapProviderSwitch style={styles.mapProviderSwitch} />
         </View>
       </View>
     </SafeAreaView>
@@ -51,5 +53,11 @@ const styles = StyleSheet.create({
     top: 20,
     right: 16,
     minWidth: 120,
+  },
+  mapProviderSwitch: {
+    position: 'absolute',
+    bottom: 100,
+    right: 16,
+    minWidth: 200,
   },
 });
