@@ -34,7 +34,7 @@ const defaultSettings = {
   cacheEnabled: true,
   maxCacheSize: 100, // 100MB
   mapProvider: 'react-native-maps' as const,
-  tileServerUrl: process.env.TILE_SERVER_URL || 'http://localhost:8080/tiles',
+  tileServerUrl: __DEV__ ? 'http://localhost:8080/api/v1/tiles' : 'https://clisapp-api.qut.edu.au/api/v1/tiles',
   apiTimeout: 10000, // 10 seconds
 };
 

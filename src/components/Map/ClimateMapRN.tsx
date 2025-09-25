@@ -56,7 +56,7 @@ export const ClimateMapRN: React.FC<ClimateMapRNProps> = ({
     console.log('Map pressed at:', coordinate);
   }, []);
 
-  // Generate tile URL template
+  // Generate tile URL template using backend API
   const tileUrlTemplate = mapProvider ? 
     (mapProvider as any).getTileUrl?.() || `${tileServerUrl}/${activeLayer}/${mapLevel}/{z}/{x}/{y}.png` :
     `${tileServerUrl}/${activeLayer}/${mapLevel}/{z}/{x}/{y}.png`;

@@ -3,6 +3,7 @@ import React from 'react';
 import { StyleSheet, View, SafeAreaView, StatusBar } from 'react-native';
 import { UniversalMap } from '../components/Map/UniversalMap';
 import { LevelSwitch } from '../components/Map/LevelSwitch';
+import { ConnectionStatus } from '../components/UI/ConnectionStatus';
 
 export const MapScreen: React.FC = () => {
   return (
@@ -14,6 +15,7 @@ export const MapScreen: React.FC = () => {
         
         {/* Map controls overlay */}
         <View style={styles.controlsOverlay}>
+          <ConnectionStatus style={styles.connectionStatus} showDetails={false} />
           <LevelSwitch style={styles.levelSwitch} />
         </View>
       </View>
@@ -37,6 +39,12 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     pointerEvents: 'box-none', // Allow touches to pass through to map
+  },
+  connectionStatus: {
+    position: 'absolute',
+    top: 20,
+    left: 16,
+    minWidth: 120,
   },
   levelSwitch: {
     position: 'absolute',
