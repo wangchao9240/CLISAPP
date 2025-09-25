@@ -12,16 +12,16 @@ interface MapProviderSwitchProps {
 }
 
 export const MapProviderSwitch: React.FC<MapProviderSwitchProps> = ({ style }) => {
-  const { mapProvider, setMapProvider } = useSettingsStore();
+  const { baseTileProvider, setBaseTileProvider } = useSettingsStore();
 
   const providers = [
     { id: 'openstreetmap', name: 'OSM', description: 'Free & Open' },
-    { id: 'react-native-maps', name: 'Native', description: 'Platform Maps' },
-    { id: 'maplibre', name: 'LibreGL', description: 'Vector Maps' },
+    { id: 'google', name: 'Google', description: 'Satellite & Street' },
+    { id: 'satellite', name: 'Satellite', description: 'Aerial View' },
   ] as const;
 
   const handleProviderChange = (provider: typeof providers[number]['id']) => {
-    setMapProvider(provider);
+    setBaseTileProvider(provider);
   };
 
   return (
@@ -33,14 +33,14 @@ export const MapProviderSwitch: React.FC<MapProviderSwitchProps> = ({ style }) =
             key={provider.id}
             style={[
               styles.button,
-              mapProvider === provider.id && styles.activeButton,
+              baseTileProvider === provider.id && styles.activeButton,
             ]}
             onPress={() => handleProviderChange(provider.id)}
           >
             <Text
               style={[
                 styles.buttonText,
-                mapProvider === provider.id && styles.activeButtonText,
+                baseTileProvider === provider.id && styles.activeButtonText,
               ]}
             >
               {provider.name}
@@ -48,7 +48,7 @@ export const MapProviderSwitch: React.FC<MapProviderSwitchProps> = ({ style }) =
             <Text
               style={[
                 styles.descriptionText,
-                mapProvider === provider.id && styles.activeDescriptionText,
+                baseTileProvider === provider.id && styles.activeDescriptionText,
               ]}
             >
               {provider.description}

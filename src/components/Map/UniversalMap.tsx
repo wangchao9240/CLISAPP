@@ -32,7 +32,7 @@ export const UniversalMap: React.FC<UniversalMapProps> = ({
     setError 
   } = useMapStore();
   
-  const { mapProvider, tileServerUrl } = useSettingsStore();
+  const { mapProvider, baseTileProvider, tileServerUrl } = useSettingsStore();
   const mapProviderRef = useRef<MapProviderInterface | null>(null);
 
   // Initialize map provider
@@ -62,7 +62,7 @@ export const UniversalMap: React.FC<UniversalMapProps> = ({
     return () => {
       mapProviderRef.current?.destroy();
     };
-  }, [mapProvider, tileServerUrl, setRegion, onRegionChange, setError]);
+  }, [mapProvider, baseTileProvider, tileServerUrl, setRegion, onRegionChange, setError]);
 
   // Update tile layer when layer or level changes
   useEffect(() => {
@@ -73,21 +73,24 @@ export const UniversalMap: React.FC<UniversalMapProps> = ({
   const renderMap = () => {
     switch (mapProvider) {
       case 'react-native-maps':
-        return (
-          <ClimateMapRN 
-            onRegionChange={onRegionChange}
-            style={style}
-            mapProvider={mapProviderRef.current}
-          />
-        );
-      
-      case 'openstreetmap':
-        return (
-          <OpenStreetMap 
-            onRegionChange={onRegionChange}
-            style={style}
-          />
-        );
+        // Use React Native Maps with different base tile providers
+        if (baseTileProvider === 'openstreetmap') {
+          return (
+            <OpenStreetMap 
+              onRegionChange={onRegionChange}
+              style={style}
+            />
+          );
+        } else {
+          // Google Maps or other providers
+          return (
+            <ClimateMapRN 
+              onRegionChange={onRegionChange}
+              style={style}
+              mapProvider={mapProviderRef.current}
+            />
+          );
+        }
       
       case 'maplibre':
         // Future implementation
@@ -99,7 +102,7 @@ export const UniversalMap: React.FC<UniversalMapProps> = ({
         );
       
       default:
-        // Default to OpenStreetMap (free option)
+        // Default to React Native Maps with OpenStreetMap
         return (
           <OpenStreetMap 
             onRegionChange={onRegionChange}
