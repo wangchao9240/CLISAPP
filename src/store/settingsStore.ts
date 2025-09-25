@@ -30,7 +30,10 @@ interface SettingsState {
   resetSettings: () => void;
 }
 
+const SETTINGS_VERSION = 2; // Increment to force reset incompatible settings
+
 const defaultSettings = {
+  _version: SETTINGS_VERSION,
   isDarkMode: false,
   enableLocationServices: true,
   cacheEnabled: true,
@@ -59,6 +62,15 @@ export const useSettingsStore = create<SettingsState>()(
     {
       name: 'clisapp-settings',
       storage: createJSONStorage(() => AsyncStorage),
+      version: SETTINGS_VERSION,
+      migrate: (persistedState: any, version: number) => {
+        // If stored version is older than current, reset to defaults
+        if (!persistedState || persistedState._version < SETTINGS_VERSION) {
+          console.log('Settings version outdated, resetting to defaults');
+          return defaultSettings;
+        }
+        return persistedState;
+      },
     }
   )
 );
