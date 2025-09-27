@@ -27,7 +27,7 @@ export const MapScreen: React.FC = () => {
           {selectorOpen && (
             <LayerSelector style={styles.selectorPanel} onSelected={() => setSelectorOpen(false)} />
           )}
-          <Legend style={styles.legend} />
+          <Legend style={styles.legend} layer={undefined as any} />
         </View>
       </View>
     </SafeAreaView>

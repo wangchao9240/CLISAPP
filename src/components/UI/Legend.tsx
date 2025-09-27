@@ -1,25 +1,28 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { CLIMATE_LAYERS } from '../../constants/climateData';
+import { useMapStore } from '../../store/mapStore';
 
 interface LegendProps {
   layer?: keyof typeof CLIMATE_LAYERS;
   style?: any;
 }
 
-export const Legend: React.FC<LegendProps> = ({ layer = 'pm25', style }) => {
-  const config = CLIMATE_LAYERS[layer];
+export const Legend: React.FC<LegendProps> = ({ layer, style }) => {
+  const { activeLayer } = useMapStore();
+  const key = (layer ?? activeLayer) as keyof typeof CLIMATE_LAYERS;
+  const config = CLIMATE_LAYERS[key];
 
   return (
     <View style={[styles.container, style]}> 
       <Text style={styles.title}>{config.name}</Text>
       <View style={styles.rows}>
-        {config.thresholds.map((t, idx) => {
+        {config.thresholds.map((t: number, idx: number) => {
           const next = config.thresholds[idx + 1];
           const label = next !== undefined ? `${t}–${next} ${config.unit}` : `${t}+ ${config.unit}`;
           const color = config.colorScale[Math.min(idx, config.colorScale.length - 1)];
           return (
-            <View key={`${layer}-${idx}`} style={styles.row}>
+            <View key={`${key}-${idx}`} style={styles.row}>
               <View style={[styles.swatch, { backgroundColor: color }]} />
               <Text style={styles.label}>{label}</Text>
             </View>

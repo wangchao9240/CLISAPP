@@ -1,23 +1,18 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useMapStore } from '../../store/mapStore';
 import { CLIMATE_LAYERS } from '../../constants/climateData';
 
 const LAYERS: Array<{ key: keyof typeof CLIMATE_LAYERS; label: string; available: boolean }> = [
   { key: 'pm25', label: 'PM2.5', available: true },
-  { key: 'precipitation', label: '降水', available: false },
-  { key: 'uv', label: '紫外线', available: false },
-  { key: 'humidity', label: '湿度', available: false },
-  { key: 'temperature', label: '温度', available: false },
+  { key: 'precipitation', label: '降水', available: true },
+  { key: 'uv', label: '紫外线', available: true },
+  { key: 'humidity', label: '湿度', available: true },
+  { key: 'temperature', label: '温度', available: true },
 ];
 
 export const LayerSelector: React.FC<{ style?: any; onSelected?: () => void }> = ({ style, onSelected }) => {
   const { activeLayer, setActiveLayer } = useMapStore();
-
-  const title = useMemo(() => {
-    const found = LAYERS.find(l => l.key === activeLayer);
-    return found ? found.label : 'PM2.5';
-  }, [activeLayer]);
 
   const onSelect = (key: keyof typeof CLIMATE_LAYERS, available: boolean) => {
     if (!available) {
