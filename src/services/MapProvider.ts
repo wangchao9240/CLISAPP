@@ -227,8 +227,8 @@ class MapLibreProvider implements MapProviderInterface {
     });
   }
 
-  onPress(callback: (coordinate: any) => void): void {
-    this.map?.on('click', (e: any) => {
+  onLongPress(callback: (coordinate: any) => void): void {
+    this.map?.on('longclick', (e: any) => {
       callback({
         latitude: e.lngLat.lat,
         longitude: e.lngLat.lng,
@@ -236,8 +236,8 @@ class MapLibreProvider implements MapProviderInterface {
     });
   }
 
-  emitPress(coordinate: { latitude: number; longitude: number }): void {
-    // MapLibre will have its own event wiring; emitPress is a no-op when
+  emitLongPress(coordinate: { latitude: number; longitude: number }): void {
+    // MapLibre will have its own event wiring; emitLongPress is a no-op when
     // the underlying map already handles callbacks internally.
     // This keeps the interface consistent across providers.
     // eslint-disable-next-line @typescript-eslint/no-empty-function
