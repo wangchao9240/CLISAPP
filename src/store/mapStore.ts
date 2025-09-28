@@ -6,72 +6,136 @@ import { Region } from '../types/map.types';
 import { ClimateLayer, MapLevel } from '../types/climate.types';
 import { QUEENSLAND_REGION } from '../constants/mapConfig';
 import { DEFAULT_LAYER } from '../constants/climateData';
+import { RegionInfoPanelState, RegionClimateOverview } from '../types/region.types';
 
 interface MapState {
-  // Map view state
   region: Region;
   activeLayer: ClimateLayer;
   mapLevel: MapLevel;
-  
-  // Loading states
+  selectedRegionId?: string;
   isLoading: boolean;
   tileLoadingProgress: number;
   error?: string;
-  
-  // Actions
+  regionInfo: RegionInfoPanelState;
   setRegion: (region: Region) => void;
   setActiveLayer: (layer: ClimateLayer) => void;
   setMapLevel: (level: MapLevel) => void;
   toggleMapLevel: () => void;
+  setSelectedRegion: (regionId?: string) => void;
   setLoading: (loading: boolean) => void;
   setTileLoadingProgress: (progress: number) => void;
   setError: (error?: string) => void;
+  openRegionInfo: (payload: {
+    regionId: string;
+    regionName: string;
+    regionType: 'lga' | 'suburb';
+    climate: RegionClimateOverview | null;
+  }) => void;
+  closeRegionInfo: () => void;
+  setRegionInfoLoading: (loading: boolean) => void;
+  setRegionInfoError: (error?: string) => void;
   resetMapState: () => void;
 }
 
 export const useMapStore = create<MapState>()(
   persist(
     (set, get) => ({
-      // Initial state
       region: QUEENSLAND_REGION,
       activeLayer: DEFAULT_LAYER,
       mapLevel: 'lga',
+      selectedRegionId: undefined,
       isLoading: false,
       tileLoadingProgress: 0,
       error: undefined,
+      regionInfo: {
+        visible: false,
+        regionId: null,
+        regionName: null,
+        regionType: null,
+        climate: null,
+        loading: false,
+        error: null,
+      },
 
-      // Actions
       setRegion: (region) => set({ region }),
-      
       setActiveLayer: (layer) => set({ activeLayer: layer, isLoading: true }),
-      
       setMapLevel: (level) => set({ mapLevel: level, isLoading: true }),
-      
       toggleMapLevel: () => {
         const currentLevel = get().mapLevel;
         const newLevel = currentLevel === 'lga' ? 'suburb' : 'lga';
         set({ mapLevel: newLevel, isLoading: true });
       },
-      
+      setSelectedRegion: (selectedRegionId) => set({ selectedRegionId }),
       setLoading: (loading) => set({ isLoading: loading }),
-      
       setTileLoadingProgress: (progress) => set({ tileLoadingProgress: progress }),
-      
       setError: (error) => set({ error, isLoading: false }),
-      
-      resetMapState: () => set({
-        region: QUEENSLAND_REGION,
-        activeLayer: DEFAULT_LAYER,
-        mapLevel: 'lga',
-        isLoading: false,
-        tileLoadingProgress: 0,
-        error: undefined,
-      }),
+      openRegionInfo: ({ regionId, regionName, regionType, climate }) =>
+        set({
+          regionInfo: {
+            visible: true,
+            regionId,
+            regionName,
+            regionType,
+            climate,
+            loading: false,
+            error: null,
+          },
+        }),
+      closeRegionInfo: () =>
+        set({
+          regionInfo: {
+            visible: false,
+            regionId: null,
+            regionName: null,
+            regionType: null,
+            climate: null,
+            loading: false,
+            error: null,
+          },
+        }),
+      setRegionInfoLoading: (loading) =>
+        set((state) => ({
+          regionInfo: {
+            ...state.regionInfo,
+            loading,
+            error: loading ? null : state.regionInfo.error,
+          },
+        })),
+      setRegionInfoError: (error) =>
+        set((state) => ({
+          regionInfo: {
+            ...state.regionInfo,
+            error: error ?? null,
+            loading: false,
+          },
+        })),
+      resetMapState: () =>
+        set({
+          region: QUEENSLAND_REGION,
+          activeLayer: DEFAULT_LAYER,
+          mapLevel: 'lga',
+          selectedRegionId: undefined,
+          isLoading: false,
+          tileLoadingProgress: 0,
+          error: undefined,
+          regionInfo: {
+            visible: false,
+            regionId: null,
+            regionName: null,
+            regionType: null,
+            climate: null,
+            loading: false,
+            error: null,
+          },
+        }),
     }),
     {
       name: 'clisapp-map',
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({ activeLayer: state.activeLayer }),
+      partialize: (state) => ({
+        activeLayer: state.activeLayer,
+        selectedRegionId: state.selectedRegionId,
+      }),
     }
   )
 );

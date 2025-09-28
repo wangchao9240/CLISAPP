@@ -5,6 +5,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { apiService, RegionSearchResult, RegionInfo, HealthStatus } from '../services/ApiService';
+import { RegionClimateOverview, RegionClimateStat } from '../types/region.types';
+import { CLIMATE_LAYERS } from '../constants/climateData';
+import { ClimateLayer } from '../types/climate.types';
 
 export interface ApiState<T> {
   data: T | null;
@@ -146,6 +149,55 @@ export const useRegionInfo = (regionId: string | null): ApiState<RegionInfo> => 
     error,
     refresh: fetchRegionInfo,
   };
+};
+
+export const fetchRegionInfoByCoordinates = async (
+  latitude: number,
+  longitude: number,
+  includeClimateData: boolean = true
+): Promise<RegionInfo | null> => {
+  const response = await apiService.getRegionByCoordinates(
+    latitude,
+    longitude,
+    includeClimateData,
+  );
+
+  if (!response.success) {
+    return null;
+  }
+  return response.data as RegionInfo;
+};
+
+export const formatClimateOverview = (
+  currentClimate: RegionInfo['current_climate'],
+  activeLayer: ClimateLayer,
+): RegionClimateOverview => {
+  if (!currentClimate) {
+    return { primary: null, secondary: [] };
+  }
+
+  const entries: RegionClimateStat[] = Object.entries(currentClimate).flatMap(([layerKey, data]) => {
+    if (!data) return [];
+    const key = layerKey as ClimateLayer;
+    const config = CLIMATE_LAYERS[key];
+
+    return [{
+      layer: key,
+      name: config?.name ?? key.toUpperCase(),
+      value: data.value,
+      unit: data.unit,
+      category: data.category ?? undefined,
+      description: config?.description,
+      lastUpdated: data.timestamp,
+    }];
+  });
+
+  const primary = entries.find((entry) => entry.layer === activeLayer) ?? null;
+  const secondary = entries
+    .filter((entry) => entry.layer !== activeLayer)
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  return { primary, secondary };
 };
 
 /**

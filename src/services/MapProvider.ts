@@ -17,7 +17,8 @@ export interface MapProviderInterface {
   
   // Event handling
   onRegionChange(callback: (region: Region) => void): void;
-  onPress(callback: (coordinate: {latitude: number, longitude: number}) => void): void;
+  onLongPress(callback: (coordinate: { latitude: number; longitude: number }) => void): void;
+  emitLongPress(coordinate: { latitude: number; longitude: number }): void;
   
   // Utility
   getVisibleBounds(): {northeast: {lat: number, lng: number}, southwest: {lat: number, lng: number}};
@@ -53,7 +54,7 @@ class ReactNativeMapsProvider implements MapProviderInterface {
   private config: MapConfig;
   private currentTileUrl: string = '';
   private regionChangeCallback?: (region: Region) => void;
-  private pressCallback?: (coordinate: any) => void;
+  private longPressCallback?: (coordinate: any) => void;
 
   constructor(config: MapConfig) {
     this.config = config;
@@ -91,8 +92,12 @@ class ReactNativeMapsProvider implements MapProviderInterface {
     this.regionChangeCallback = callback;
   }
 
-  onPress(callback: (coordinate: any) => void): void {
-    this.pressCallback = callback;
+  onLongPress(callback: (coordinate: any) => void): void {
+    this.longPressCallback = callback;
+  }
+
+  emitLongPress(coordinate: { latitude: number; longitude: number }): void {
+    this.longPressCallback?.(coordinate);
   }
 
   getVisibleBounds() {
@@ -110,7 +115,7 @@ class ReactNativeMapsProvider implements MapProviderInterface {
   destroy(): void {
     this.mapRef = null;
     this.regionChangeCallback = undefined;
-    this.pressCallback = undefined;
+    this.longPressCallback = undefined;
   }
 }
 
@@ -229,6 +234,13 @@ class MapLibreProvider implements MapProviderInterface {
         longitude: e.lngLat.lng,
       });
     });
+  }
+
+  emitPress(coordinate: { latitude: number; longitude: number }): void {
+    // MapLibre will have its own event wiring; emitPress is a no-op when
+    // the underlying map already handles callbacks internally.
+    // This keeps the interface consistent across providers.
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
   }
 
   getVisibleBounds() {

@@ -1,6 +1,8 @@
 // Climate data layer configurations
 import { ClimateDataConfig, ClimateLayer } from '../types/climate.types';
 
+export const CLIMATE_LAYER_ORDER: ClimateLayer[] = ['pm25', 'precipitation', 'uv', 'humidity', 'temperature'];
+
 export const CLIMATE_LAYERS: Record<ClimateLayer, ClimateDataConfig> = {
   pm25: {
     name: 'PM2.5 Concentration',

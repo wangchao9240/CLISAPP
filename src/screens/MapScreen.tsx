@@ -6,6 +6,7 @@ import { UniversalMap } from '../components/Map/UniversalMap';
 
 import { Legend } from '../components/UI/Legend';
 import { LayerSelector } from '../components/UI/LayerSelector';
+import { RegionSearchBar } from '../components/UI/RegionSearchBar';
 import { TouchableOpacity, Text } from 'react-native';
 import { useState } from 'react';
 
@@ -27,6 +28,7 @@ export const MapScreen: React.FC = () => {
           {selectorOpen && (
             <LayerSelector style={styles.selectorPanel} onSelected={() => setSelectorOpen(false)} />
           )}
+          <RegionSearchBar style={styles.searchBar} />
           <Legend style={styles.legend} layer={undefined as any} />
         </View>
       </View>
@@ -68,6 +70,12 @@ const styles = StyleSheet.create({
   selectorPanel: {
     position: 'absolute',
     top: 56,
+    right: 16,
+  },
+  searchBar: {
+    position: 'absolute',
+    top: 64,
+    left: 16,
     right: 16,
   },
   legend: {

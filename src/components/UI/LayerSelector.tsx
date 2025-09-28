@@ -2,8 +2,9 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useMapStore } from '../../store/mapStore';
 import { CLIMATE_LAYERS } from '../../constants/climateData';
+import { ClimateLayer } from '../../types/climate.types';
 
-const LAYERS: Array<{ key: keyof typeof CLIMATE_LAYERS; label: string; available: boolean }> = [
+export const LAYERS: Array<{ key: ClimateLayer; label: string; available: boolean }> = [
   { key: 'pm25', label: 'PM2.5', available: true },
   { key: 'precipitation', label: '降水', available: true },
   { key: 'uv', label: '紫外线', available: true },
@@ -14,7 +15,7 @@ const LAYERS: Array<{ key: keyof typeof CLIMATE_LAYERS; label: string; available
 export const LayerSelector: React.FC<{ style?: any; onSelected?: () => void }> = ({ style, onSelected }) => {
   const { activeLayer, setActiveLayer } = useMapStore();
 
-  const onSelect = (key: keyof typeof CLIMATE_LAYERS, available: boolean) => {
+  const onSelect = (key: ClimateLayer, available: boolean) => {
     if (!available) {
       Alert.alert('提示', '该数据维度即将推出');
       return;
@@ -45,6 +46,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
+    zIndex: 999,
   },
   current: {
     fontSize: 14,

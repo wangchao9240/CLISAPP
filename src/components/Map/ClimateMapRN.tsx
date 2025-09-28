@@ -50,11 +50,10 @@ export const ClimateMapRN: React.FC<ClimateMapRNProps> = ({
     Alert.alert('Map Error', 'Failed to load map data. Please check your connection.');
   }, [setError]);
 
-  const handleMapPress = useCallback((event: any) => {
+  const handleMapLongPress = useCallback((event: any) => {
     const { coordinate } = event.nativeEvent;
-    // This will be handled by the MapProvider
-    console.log('Map pressed at:', coordinate);
-  }, []);
+    mapProvider?.emitLongPress?.(coordinate);
+  }, [mapProvider]);
 
   // Generate tile URL template for Phase 0 tile server
   // Phase 0 format: http://localhost:8000/tiles/pm25/{z}/{x}/{y}.png
@@ -77,7 +76,7 @@ export const ClimateMapRN: React.FC<ClimateMapRNProps> = ({
         region={region}
         onRegionChangeComplete={handleRegionChangeComplete}
         onError={handleMapError}
-        onPress={handleMapPress}
+        onLongPress={handleMapLongPress}
         showsUserLocation
         showsMyLocationButton
         showsCompass

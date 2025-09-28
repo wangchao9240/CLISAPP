@@ -15,7 +15,7 @@ export interface ApiResponse<T = any> {
 export interface RegionSearchResult {
   id: string;
   name: string;
-  type: 'lga' | 'suburb' | 'postcode' | 'city';
+  type: 'lga' | 'suburb';
   state: string;
   location: {
     latitude: number;
@@ -28,7 +28,7 @@ export interface RegionSearchResult {
 export interface RegionInfo {
   id: string;
   name: string;
-  type: 'lga' | 'suburb' | 'postcode';
+  type: 'lga' | 'suburb';
   state: string;
   location: {
     latitude: number;
@@ -41,7 +41,14 @@ export interface RegionInfo {
   area_km2?: number;
   population?: number;
   population_density?: number;
-  current_climate?: any;
+  current_climate?: Record<string, {
+    layer: string;
+    value: number;
+    unit: string;
+    timestamp: string;
+    quality?: string;
+    category?: string;
+  }>;
   last_updated?: string;
 }
 
@@ -53,7 +60,7 @@ export interface HealthStatus {
 }
 
 class ApiService {
-  private baseUrl: string;
+  public baseUrl: string;
   private timeout: number;
 
   constructor() {
@@ -64,7 +71,7 @@ class ApiService {
   /**
    * Generic fetch method with error handling
    */
-  private async fetchWithTimeout(url: string, options: RequestInit = {}): Promise<ApiResponse> {
+  public async fetchWithTimeout(url: string, options: RequestInit = {}): Promise<ApiResponse> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
@@ -126,7 +133,7 @@ class ApiService {
    */
   async searchRegions(
     query: string,
-    type?: 'lga' | 'suburb' | 'postcode',
+    type?: 'lga' | 'suburb',
     limit: number = 10
   ): Promise<ApiResponse<RegionSearchResult[]>> {
     const params = new URLSearchParams({
@@ -191,6 +198,20 @@ class ApiService {
     }
 
     const url = buildApiUrl(`${API_ENDPOINTS.REGIONS_INFO}/${regionId}/climate?${params.toString()}`);
+    return this.fetchWithTimeout(url);
+  }
+
+  async getRegionByCoordinates(
+    lat: number,
+    lng: number,
+    includeClimateData: boolean = true
+  ): Promise<ApiResponse<RegionInfo>> {
+    const params = new URLSearchParams({
+      lat: lat.toString(),
+      lng: lng.toString(),
+      include_climate_data: includeClimateData.toString(),
+    });
+    const url = buildApiUrl(`${API_ENDPOINTS.REGIONS_BY_COORDINATES}?${params.toString()}`);
     return this.fetchWithTimeout(url);
   }
 

@@ -12,11 +12,12 @@ export interface ClimateDataConfig {
 }
 
 export interface ClimateDataPoint {
-  latitude: number;
-  longitude: number;
-  value: number;
-  timestamp: string;
   layer: ClimateLayer;
+  value: number;
+  unit: string;
+  timestamp: string;
+  quality?: string;
+  category?: string;
 }
 
 export interface RegionData {

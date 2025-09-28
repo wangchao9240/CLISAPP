@@ -42,6 +42,7 @@ export const API_ENDPOINTS = {
   REGIONS_CLIMATE: '/api/v1/regions/climate',
   REGIONS_NEARBY: '/api/v1/regions/nearby',
   REGIONS_BOUNDS: '/api/v1/regions/bounds',
+  REGIONS_BY_COORDINATES: '/api/v1/regions/by-coordinates',
 } as const;
 
 // Helper function to build full API URLs
