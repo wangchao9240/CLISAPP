@@ -80,7 +80,7 @@ export const RegionSearchBar: React.FC<RegionSearchBarProps> = ({ style }) => {
     fetchRegionInfoByCoordinates(item.location.latitude, item.location.longitude, true)
       .then((info) => {
         if (!info) {
-          setRegionInfoError('未找到该区域的气候数据');
+        setRegionInfoError('No climate data available for this region');
           return;
         }
         const overview = formatClimateOverview(info.current_climate, useMapStore.getState().activeLayer);
@@ -93,7 +93,7 @@ export const RegionSearchBar: React.FC<RegionSearchBarProps> = ({ style }) => {
       })
       .catch((err) => {
         console.error('Failed to load region info', err);
-        setRegionInfoError('加载区域信息失败');
+      setRegionInfoError('Failed to load region information');
       });
   }, [setRegion, setMapLevel, clearResults, setSelectedRegion, openRegionInfo, setRegionInfoLoading, setRegionInfoError]);
 
@@ -119,7 +119,7 @@ export const RegionSearchBar: React.FC<RegionSearchBarProps> = ({ style }) => {
       <TextInput
         style={styles.input}
         value={query}
-        placeholder="搜索地区 (LGA / Suburb / Postcode)"
+        placeholder="Search region (LGA / Suburb)"
         onChangeText={handleChangeText}
         accessibilityLabel="Region search"
         returnKeyType="search"
@@ -170,7 +170,7 @@ const formatRegionMeta = (item: RegionSearchResult) => {
   parts.push(item.state);
   parts.push(item.type.toUpperCase());
   if (item.population) {
-    parts.push(`人口 ${item.population.toLocaleString()}`);
+    parts.push(`Population ${item.population.toLocaleString()}`);
   }
   return parts.join(' · ');
 };

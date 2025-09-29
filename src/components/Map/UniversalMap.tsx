@@ -90,7 +90,7 @@ export const UniversalMap: React.FC<UniversalMapProps> = ({
         setRegionInfoLoading(true);
         const info = await fetchRegionInfoByCoordinates(latitude, longitude, true);
         if (!info) {
-          setRegionInfoError('未找到该位置的区域信息');
+          setRegionInfoError('No regional information found for this location');
           return;
         }
         const overview = formatClimateOverview(info.current_climate, activeLayer);
@@ -103,7 +103,7 @@ export const UniversalMap: React.FC<UniversalMapProps> = ({
         setSelectedRegion(info.id);
       } catch (error) {
         console.error('Failed to fetch region info', error);
-        setRegionInfoError('加载区域信息失败');
+        setRegionInfoError('Failed to load region information');
       }
     },
     [activeLayer, openRegionInfo, setRegionInfoLoading, setRegionInfoError, setSelectedRegion]

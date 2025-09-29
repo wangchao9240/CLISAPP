@@ -37,7 +37,7 @@ export const RegionInfoPanel: React.FC = () => {
       </View>
 
       <View style={styles.primaryBlock}>
-        <Text style={styles.primaryTitle}>{primary?.name ?? '环境数据'}</Text>
+        <Text style={styles.primaryTitle}>{primary?.name ?? 'Environmental Data'}</Text>
         <Text style={styles.primaryValue}>{formatValue(primary)}</Text>
         {primary?.category && <Text style={styles.primaryCategory}>{primary.category}</Text>}
       </View>
@@ -57,15 +57,15 @@ export const RegionInfoPanel: React.FC = () => {
           </View>
         ))}
         {secondary.length === 0 && !loading && !error && (
-          <Text style={styles.emptyHint}>暂无其他维度数据</Text>
+          <Text style={styles.emptyHint}>No additional data available</Text>
         )}
       </ScrollView>
 
       <View style={styles.footer}>
-        {loading && <Text style={styles.statusText}>正在加载区域信息...</Text>}
+        {loading && <Text style={styles.statusText}>Loading region information...</Text>}
         {!loading && error && <Text style={styles.errorText}>{error}</Text>}
         {!loading && !error && primary?.lastUpdated && (
-          <Text style={styles.statusText}>数据时间: {new Date(primary.lastUpdated).toLocaleString()}</Text>
+          <Text style={styles.statusText}>Data time: {new Date(primary.lastUpdated).toLocaleString()}</Text>
         )}
       </View>
     </View>

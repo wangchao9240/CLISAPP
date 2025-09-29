@@ -6,10 +6,10 @@ import { ClimateLayer } from '../../types/climate.types';
 
 export const LAYERS: Array<{ key: ClimateLayer; label: string; available: boolean }> = [
   { key: 'pm25', label: 'PM2.5', available: true },
-  { key: 'precipitation', label: '降水', available: true },
-  { key: 'uv', label: '紫外线', available: true },
-  { key: 'humidity', label: '湿度', available: true },
-  { key: 'temperature', label: '温度', available: true },
+  { key: 'precipitation', label: 'Precipitation', available: true },
+  { key: 'uv', label: 'UV Index', available: true },
+  { key: 'humidity', label: 'Humidity', available: true },
+  { key: 'temperature', label: 'Temperature', available: true },
 ];
 
 export const LayerSelector: React.FC<{ style?: any; onSelected?: () => void }> = ({ style, onSelected }) => {
@@ -17,7 +17,7 @@ export const LayerSelector: React.FC<{ style?: any; onSelected?: () => void }> =
 
   const onSelect = (key: ClimateLayer, available: boolean) => {
     if (!available) {
-      Alert.alert('提示', '该数据维度即将推出');
+      Alert.alert('Notice', 'This data dimension is coming soon');
       return;
     }
     setActiveLayer(key as any);
@@ -31,7 +31,7 @@ export const LayerSelector: React.FC<{ style?: any; onSelected?: () => void }> =
         {LAYERS.map(item => (
           <TouchableOpacity key={item.key} onPress={() => onSelect(item.key, item.available)} style={styles.item}>
             <Text style={[styles.itemText, item.key === activeLayer && styles.active]}>
-              {item.label}{item.key === activeLayer ? ' ✓' : item.available ? '' : '（即将推出）'}
+              {item.label}{item.key === activeLayer ? ' ✓' : item.available ? '' : ' (coming soon)'}
             </Text>
           </TouchableOpacity>
         ))}

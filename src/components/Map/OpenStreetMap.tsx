@@ -54,7 +54,7 @@ export const OpenStreetMap: React.FC<OpenStreetMapProps> = ({
       setRegionInfoLoading(true);
       const info = await fetchRegionInfoByCoordinates(coordinate.latitude, coordinate.longitude, true);
       if (!info) {
-        setRegionInfoError('未找到该位置的区域信息');
+        setRegionInfoError('No regional information found for this location');
         return;
       }
       const overview = formatClimateOverview(info.current_climate, useMapStore.getState().activeLayer);
@@ -67,7 +67,7 @@ export const OpenStreetMap: React.FC<OpenStreetMapProps> = ({
       setSelectedRegion(info.id);
     } catch (error) {
       console.error('Failed to fetch region info', error);
-      setRegionInfoError('加载区域信息失败');
+      setRegionInfoError('Failed to load region information');
     }
   }, [openRegionInfo, setRegionInfoLoading, setRegionInfoError, setSelectedRegion]);
 
