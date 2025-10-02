@@ -4,7 +4,7 @@ const isDevelopment = __DEV__;
 export const API_CONFIG = {
   // Backend base URL
   BASE_URL: isDevelopment 
-    ? 'http://localhost:8000'
+    ? 'http://localhost:8080'
     : 'https://clisapp-api.qut.edu.au',
     
   // Tile server configuration (using Phase 0 tile server)

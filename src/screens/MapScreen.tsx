@@ -23,7 +23,7 @@ export const MapScreen: React.FC = () => {
         {/* Map controls overlay */}
         <View style={styles.controlsOverlay}>
           <TouchableOpacity style={styles.selectorButton} onPress={() => setSelectorOpen(v => !v)}>
-            <Text style={styles.selectorButtonText}>图层</Text>
+            <Text style={styles.selectorButtonText}>Layer</Text>
           </TouchableOpacity>
           {selectorOpen && (
             <LayerSelector style={styles.selectorPanel} onSelected={() => setSelectorOpen(false)} />

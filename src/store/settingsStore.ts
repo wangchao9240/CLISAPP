@@ -40,7 +40,7 @@ const defaultSettings = {
   maxCacheSize: 100, // 100MB
   mapProvider: 'react-native-maps' as const,
   baseTileProvider: 'openstreetmap' as const,
-  tileServerUrl: __DEV__ ? 'http://localhost:8001/tiles' : 'https://clisapp-api.qut.edu.au/api/v1/tiles',
+  tileServerUrl: __DEV__ ? 'http://localhost:8000/tiles' : 'https://clisapp-api.qut.edu.au/api/v1/tiles',
   apiTimeout: 10000, // 10 seconds
 };
 
