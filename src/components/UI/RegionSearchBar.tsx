@@ -116,15 +116,18 @@ export const RegionSearchBar: React.FC<RegionSearchBarProps> = ({ style }) => {
 
   return (
     <View style={[styles.container, style]}>
-      <TextInput
-        style={styles.input}
-        value={query}
-        placeholder="Search region (LGA / Suburb)"
-        onChangeText={handleChangeText}
-        accessibilityLabel="Region search"
-        returnKeyType="search"
-      />
-      {loading && <ActivityIndicator style={styles.indicator} size="small" color="#007AFF" />}
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          value={query}
+          placeholder="Search location or suburb"
+          placeholderTextColor="rgba(10, 10, 10, 0.5)"
+          onChangeText={handleChangeText}
+          accessibilityLabel="Region search"
+          returnKeyType="search"
+        />
+        {loading && <ActivityIndicator style={styles.indicator} size="small" color="#0A0A0A" />}
+      </View>
       {!loading && error && <Text style={styles.errorText}>{error}</Text>}
       {data.length > 0 && (
         <View style={styles.resultsContainer}>
@@ -178,36 +181,64 @@ const formatRegionMeta = (item: RegionSearchResult) => {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    maxWidth: 320,
     alignSelf: 'flex-start',
+    position: 'relative',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 16,
+    paddingLeft: 12,
+    paddingRight: 16,
+    height: 54,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.05)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  searchIcon: {
+    fontSize: 20,
+    marginRight: 8,
+    opacity: 0.6,
   },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderRadius: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    fontSize: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.1)',
+    flex: 1,
+    fontSize: 16,
+    color: '#0A0A0A',
+    letterSpacing: -0.31,
+    padding: 0,
   },
   indicator: {
-    position: 'absolute',
-    right: 12,
-    top: 9,
+    marginLeft: 8,
   },
   errorText: {
-    marginTop: 4,
+    position: 'absolute',
+    top: 58,
+    left: 0,
     fontSize: 12,
     color: '#D32F2F',
   },
   resultsContainer: {
-    marginTop: 6,
+    position: 'absolute',
+    top: 62,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
     borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.98)',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.1)',
+    borderColor: 'rgba(0, 0, 0, 0.1)',
     maxHeight: 220,
     overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
   },
   resultItem: {
     paddingVertical: 10,
@@ -228,7 +259,7 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: 1,
-    backgroundColor: 'rgba(0,0,0,0.05)',
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
     marginHorizontal: 8,
   },
 });
