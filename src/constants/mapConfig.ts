@@ -31,7 +31,7 @@ export const MAP_ZOOM_LEVELS = {
 export const TILE_CONFIG = {
   maximumZ: 12,
   minimumZ: 6,
-  opacity: 0.8,
+  opacity: 0.2, // Reduced opacity for more natural blending with base map
   cacheMaxAgeSec: 60 * 60 * 24 * 7, // 7 days
   cacheNamespace: 'clisapp_tile_cache',
 } as const;
