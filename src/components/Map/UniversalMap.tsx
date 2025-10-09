@@ -1,6 +1,6 @@
 // Universal map component that can switch between React Native Maps and MapLibre
 import React, { useEffect, useRef, useCallback } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useMapStore } from '../../store/mapStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { MapProviderFactory, MapProviderInterface } from '../../services/MapProvider';
@@ -8,10 +8,7 @@ import { fetchRegionInfoByCoordinates, formatClimateOverview } from '../../hooks
 import { Region } from '../../types/map.types';
 import { RegionInfoPanel } from '../panels/RegionInfoPanel';
 
-// React Native Maps implementation
-import { ClimateMapRN } from './ClimateMapRN';
-
-// OpenStreetMap implementation (free alternative)
+// OpenStreetMap implementation
 import { OpenStreetMap } from './OpenStreetMap';
 
 // MapLibre implementation (placeholder for future)
@@ -34,7 +31,6 @@ export const UniversalMap: React.FC<UniversalMapProps> = ({
     mapLevel, 
     setRegion, 
     selectedRegionId,
-    animateToRegion,
     setError,
     setSelectedRegion,
     openRegionInfo,
@@ -42,8 +38,33 @@ export const UniversalMap: React.FC<UniversalMapProps> = ({
     setRegionInfoError,
   } = useMapStore();
   
-  const { mapProvider, baseTileProvider, tileServerUrl } = useSettingsStore();
+  const { mapProvider, tileServerUrl } = useSettingsStore();
   const mapProviderRef = useRef<MapProviderInterface | null>(null);
+
+  const handleMapLongPress = useCallback(
+    async (latitude: number, longitude: number) => {
+      try {
+        setRegionInfoLoading(true);
+        const info = await fetchRegionInfoByCoordinates(latitude, longitude, true);
+        if (!info) {
+          setRegionInfoError('No regional information found for this location');
+          return;
+        }
+        const overview = formatClimateOverview(info.current_climate, activeLayer);
+        openRegionInfo({
+          regionId: info.id,
+          regionName: info.name,
+          regionType: info.type,
+          climate: overview,
+        });
+        setSelectedRegion(info.id);
+      } catch (error) {
+        console.error('Failed to fetch region info', error);
+        setRegionInfoError('Failed to load region information');
+      }
+    },
+    [activeLayer, openRegionInfo, setRegionInfoLoading, setRegionInfoError, setSelectedRegion]
+  );
 
   useEffect(() => {
     try {
@@ -72,7 +93,7 @@ export const UniversalMap: React.FC<UniversalMapProps> = ({
       mapProviderRef.current?.destroy();
       onMapReady?.(null);
     };
-  }, [mapProvider, baseTileProvider, tileServerUrl, setRegion, onRegionChange, setError, onMapReady]);
+  }, [mapProvider, tileServerUrl, setRegion, onRegionChange, setError, onMapReady, handleMapLongPress]);
 
   useEffect(() => {
     mapProviderRef.current?.setTileLayer(activeLayer, mapLevel);
@@ -84,54 +105,19 @@ export const UniversalMap: React.FC<UniversalMapProps> = ({
     }
   }, [selectedRegionId, region]);
 
-  const handleMapLongPress = useCallback(
-    async (latitude: number, longitude: number) => {
-      try {
-        setRegionInfoLoading(true);
-        const info = await fetchRegionInfoByCoordinates(latitude, longitude, true);
-        if (!info) {
-          setRegionInfoError('No regional information found for this location');
-          return;
-        }
-        const overview = formatClimateOverview(info.current_climate, activeLayer);
-        openRegionInfo({
-          regionId: info.id,
-          regionName: info.name,
-          regionType: info.type,
-          climate: overview,
-        });
-        setSelectedRegion(info.id);
-      } catch (error) {
-        console.error('Failed to fetch region info', error);
-        setRegionInfoError('Failed to load region information');
-      }
-    },
-    [activeLayer, openRegionInfo, setRegionInfoLoading, setRegionInfoError, setSelectedRegion]
-  );
-
   const renderMap = () => {
     switch (mapProvider) {
       case 'react-native-maps':
-        if (baseTileProvider === 'openstreetmap') {
-          return (
-            <OpenStreetMap 
-              onRegionChange={onRegionChange}
-              style={style}
-              providerRef={mapProviderRef}
-            />
-          );
-        }
         return (
-          <ClimateMapRN 
+          <OpenStreetMap 
             onRegionChange={onRegionChange}
             style={style}
-            mapProvider={mapProviderRef.current}
+            providerRef={mapProviderRef}
           />
         );
       case 'maplibre':
         return (
-          <View style={styles.placeholder}>
-          </View>
+          <View style={styles.placeholder} />
         );
       default:
         return (
