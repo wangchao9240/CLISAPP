@@ -5,7 +5,7 @@
 
 import React, { useCallback, useEffect, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
-import MapView, { UrlTile, LatLng, Region as RNRegion, MapEvent } from 'react-native-maps';
+import MapView, { UrlTile, LatLng, Region as RNRegion, Polygon } from 'react-native-maps';
 import { useMapStore } from '../../store/mapStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { Region } from '../../types/map.types';
@@ -25,7 +25,7 @@ export const OpenStreetMap: React.FC<OpenStreetMapProps> = ({
   style,
   providerRef,
 }) => {
-  const { region, activeLayer, mapLevel, setRegion, setLoading, setError, openRegionInfo, setRegionInfoLoading, setRegionInfoError, setSelectedRegion } = useMapStore();
+  const { region, activeLayer, mapLevel, regionBoundary, setRegion, setLoading, openRegionInfo, setRegionInfoLoading, setRegionInfoError, setSelectedRegion } = useMapStore();
   const { tileServerUrl } = useSettingsStore();
 
   const mapRef = useRef<MapView>(null);
@@ -43,13 +43,8 @@ export const OpenStreetMap: React.FC<OpenStreetMapProps> = ({
     setLoading(false);
   }, [setRegion, onRegionChange, setLoading]);
 
-  const handleMapError = useCallback((error: any) => {
-    console.error('Map error:', error);
-    setError('Failed to load map data');
-  }, [setError]);
-
-  const handleMapLongPress = useCallback(async (event: MapEvent<LatLng>) => {
-    const coordinate = event.nativeEvent.coordinate;
+  const handleMapLongPress = useCallback(async (event: any) => {
+    const coordinate = event.nativeEvent.coordinate as LatLng;
     try {
       setRegionInfoLoading(true);
       const info = await fetchRegionInfoByCoordinates(coordinate.latitude, coordinate.longitude, true);
@@ -105,7 +100,7 @@ export const OpenStreetMap: React.FC<OpenStreetMapProps> = ({
         mapRef.current?.animateToRegion(target as any, 0);
       };
       providerRef.current.emitLongPress = (coordinate) => {
-        handleMapLongPress({ nativeEvent: { coordinate } } as MapEvent<LatLng>);
+        handleMapLongPress({ nativeEvent: { coordinate } });
       };
     }
   }, [providerRef, handleMapLongPress]);
@@ -124,7 +119,6 @@ export const OpenStreetMap: React.FC<OpenStreetMapProps> = ({
           }
           handleRegionChangeComplete(clamped as any);
         }}
-        onError={handleMapError}
         showsUserLocation
         showsMyLocationButton
         showsCompass
@@ -147,6 +141,16 @@ export const OpenStreetMap: React.FC<OpenStreetMapProps> = ({
           opacity={TILE_CONFIG.opacity}
           zIndex={2}
         />
+        {regionBoundary && regionBoundary.coordinates.map((polygon, idx) => (
+          <Polygon
+            key={`${regionBoundary.regionId}-${idx}`}
+            coordinates={polygon}
+            strokeColor="#007AFF"
+            strokeWidth={3}
+            fillColor="rgba(0, 122, 255, 0.1)"
+            zIndex={3}
+          />
+        ))}
       </MapView>
     </View>
   );

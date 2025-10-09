@@ -1,7 +1,7 @@
 // React Native Maps specific implementation
 import React, { useCallback, useEffect, useRef } from 'react';
 import { StyleSheet, View, Alert } from 'react-native';
-import MapView, { PROVIDER_GOOGLE, UrlTile } from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE, UrlTile, Polygon } from 'react-native-maps';
 import { useMapStore } from '../../store/mapStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { Region } from '../../types/map.types';
@@ -23,6 +23,7 @@ export const ClimateMapRN: React.FC<ClimateMapRNProps> = ({
     region, 
     activeLayer, 
     mapLevel, 
+    regionBoundary,
     setRegion, 
     setLoading, 
     setError 
@@ -43,12 +44,6 @@ export const ClimateMapRN: React.FC<ClimateMapRNProps> = ({
     onRegionChange?.(newRegion);
     setLoading(false);
   }, [setRegion, onRegionChange, setLoading]);
-
-  const handleMapError = useCallback((error: any) => {
-    console.error('Map error:', error);
-    setError('Failed to load map data');
-    Alert.alert('Map Error', 'Failed to load map data. Please check your connection.');
-  }, [setError]);
 
   const handleMapLongPress = useCallback((event: any) => {
     const { coordinate } = event.nativeEvent;
@@ -75,7 +70,6 @@ export const ClimateMapRN: React.FC<ClimateMapRNProps> = ({
         initialRegion={region}
         region={region}
         onRegionChangeComplete={handleRegionChangeComplete}
-        onError={handleMapError}
         onLongPress={handleMapLongPress}
         showsUserLocation
         showsMyLocationButton
@@ -91,6 +85,16 @@ export const ClimateMapRN: React.FC<ClimateMapRNProps> = ({
           flipY={false}
           opacity={TILE_CONFIG.opacity}
         />
+        {regionBoundary && regionBoundary.coordinates.map((polygon, idx) => (
+          <Polygon
+            key={`${regionBoundary.regionId}-${idx}`}
+            coordinates={polygon}
+            strokeColor="#007AFF"
+            strokeWidth={3}
+            fillColor="rgba(0, 122, 255, 0.1)"
+            zIndex={3}
+          />
+        ))}
       </MapView>
     </View>
   );

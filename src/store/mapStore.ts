@@ -8,6 +8,12 @@ import { QUEENSLAND_REGION } from '../constants/mapConfig';
 import { DEFAULT_LAYER } from '../constants/climateData';
 import { RegionInfoPanelState, RegionClimateOverview } from '../types/region.types';
 
+interface RegionBoundaryData {
+  regionId: string;
+  coordinates: Array<Array<{ latitude: number; longitude: number }>>;
+  properties?: any;
+}
+
 interface MapState {
   region: Region;
   activeLayer: ClimateLayer;
@@ -17,6 +23,7 @@ interface MapState {
   tileLoadingProgress: number;
   error?: string;
   regionInfo: RegionInfoPanelState;
+  regionBoundary: RegionBoundaryData | null;
   setRegion: (region: Region) => void;
   setActiveLayer: (layer: ClimateLayer) => void;
   setMapLevel: (level: MapLevel) => void;
@@ -34,6 +41,7 @@ interface MapState {
   closeRegionInfo: () => void;
   setRegionInfoLoading: (loading: boolean) => void;
   setRegionInfoError: (error?: string) => void;
+  setRegionBoundary: (boundary: RegionBoundaryData | null) => void;
   resetMapState: () => void;
 }
 
@@ -47,6 +55,7 @@ export const useMapStore = create<MapState>()(
       isLoading: false,
       tileLoadingProgress: 0,
       error: undefined,
+      regionBoundary: null,
       regionInfo: {
         visible: false,
         regionId: null,
@@ -109,6 +118,7 @@ export const useMapStore = create<MapState>()(
             loading: false,
           },
         })),
+      setRegionBoundary: (boundary) => set({ regionBoundary: boundary }),
       resetMapState: () =>
         set({
           region: QUEENSLAND_REGION,
@@ -118,6 +128,7 @@ export const useMapStore = create<MapState>()(
           isLoading: false,
           tileLoadingProgress: 0,
           error: undefined,
+          regionBoundary: null,
           regionInfo: {
             visible: false,
             regionId: null,

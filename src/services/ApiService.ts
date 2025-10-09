@@ -59,6 +59,21 @@ export interface HealthStatus {
   version: string;
 }
 
+export interface RegionBoundary {
+  type: 'Feature';
+  id: string;
+  properties: {
+    id: string;
+    name: string;
+    type: 'lga' | 'suburb';
+    state: string;
+    area_km2?: number;
+    parent_region?: string;
+    postcode?: string;
+  };
+  geometry: GeoJSON.Geometry;
+}
+
 class ApiService {
   public baseUrl: string;
   private timeout: number;
@@ -212,6 +227,14 @@ class ApiService {
       include_climate_data: includeClimateData.toString(),
     });
     const url = buildApiUrl(`${API_ENDPOINTS.REGIONS_BY_COORDINATES}?${params.toString()}`);
+    return this.fetchWithTimeout(url);
+  }
+
+  /**
+   * Get region boundary (GeoJSON geometry)
+   */
+  async getRegionBoundary(regionId: string): Promise<ApiResponse<GeoJSON.Feature>> {
+    const url = buildApiUrl(`${API_ENDPOINTS.REGIONS_INFO}/${regionId}/boundary`);
     return this.fetchWithTimeout(url);
   }
 

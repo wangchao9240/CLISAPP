@@ -9,12 +9,11 @@ import {
   StyleSheet,
   Keyboard,
 } from 'react-native';
-import { useRegionSearch } from '../../hooks/useApi';
+import { useRegionSearch, formatClimateOverview } from '../../hooks/useApi';
 import { RegionSearchResult } from '../../services/ApiService';
 import { useMapStore } from '../../store/mapStore';
 import { Region } from '../../types/map.types';
-import { fetchRegionInfoByCoordinates, formatClimateOverview } from '../../hooks/useApi';
-import { useSettingsStore } from '../../store/settingsStore';
+import { apiService } from '../../services/ApiService';
 
 interface RegionSearchBarProps {
   style?: any;
@@ -23,10 +22,9 @@ interface RegionSearchBarProps {
 export const RegionSearchBar: React.FC<RegionSearchBarProps> = ({ style }) => {
   const [query, setQuery] = useState('');
   const [suppressSearch, setSuppressSearch] = useState(false);
-  const debounceRef = useRef<NodeJS.Timeout>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const { data, loading, error, searchRegions, clearResults } = useRegionSearch();
-  const { setRegion, setMapLevel, setSelectedRegion, setLoading, openRegionInfo, setRegionInfoLoading, setRegionInfoError, closeRegionInfo } = useMapStore();
-  const { tileServerUrl } = useSettingsStore();
+  const { setRegion, setMapLevel, setSelectedRegion, setLoading, openRegionInfo, setRegionInfoLoading, setRegionInfoError, closeRegionInfo, setRegionBoundary } = useMapStore();
 
   useEffect(() => {
     if (suppressSearch) {
@@ -77,12 +75,15 @@ export const RegionSearchBar: React.FC<RegionSearchBarProps> = ({ style }) => {
     }
 
     setRegionInfoLoading(true);
-    fetchRegionInfoByCoordinates(item.location.latitude, item.location.longitude, true)
-      .then((info) => {
-        if (!info) {
-        setRegionInfoError('No climate data available for this region');
+    
+    // Fetch region info by ID (保持用户选择的区域类型，不会因为坐标查询而改变)
+    apiService.getRegionInfo(item.id, true)
+      .then((response) => {
+        if (!response.success || !response.data) {
+          setRegionInfoError('No climate data available for this region');
           return;
         }
+        const info = response.data;
         const overview = formatClimateOverview(info.current_climate, useMapStore.getState().activeLayer);
         openRegionInfo({
           regionId: info.id,
@@ -93,26 +94,41 @@ export const RegionSearchBar: React.FC<RegionSearchBarProps> = ({ style }) => {
       })
       .catch((err) => {
         console.error('Failed to load region info', err);
-      setRegionInfoError('Failed to load region information');
+        setRegionInfoError('Failed to load region information');
       });
-  }, [setRegion, setMapLevel, clearResults, setSelectedRegion, openRegionInfo, setRegionInfoLoading, setRegionInfoError]);
 
-  const renderResult = ({ item }: { item: RegionSearchResult }) => (
-    <TouchableOpacity style={styles.resultItem} onPress={() => handleSelect(item)}>
-      <View style={styles.resultTextContainer}>
-        <Text style={styles.resultName}>{item.name}</Text>
-        <Text style={styles.resultMeta}>{formatRegionMeta(item)}</Text>
-      </View>
-    </TouchableOpacity>
-  );
+    // Fetch region boundary
+    apiService.getRegionBoundary(item.id)
+      .then((response) => {
+        if (response.success && response.data) {
+          const feature = response.data;
+          // Convert GeoJSON coordinates to React Native Maps format
+          const coordinates = convertGeoJSONToMapCoordinates(feature.geometry);
+          setRegionBoundary({
+            regionId: item.id,
+            coordinates,
+            properties: feature.properties,
+          });
+        } else {
+          console.warn('Failed to fetch region boundary:', response.error);
+          setRegionBoundary(null);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load region boundary', err);
+        setRegionBoundary(null);
+      });
+  }, [setRegion, setMapLevel, clearResults, setSelectedRegion, setLoading, openRegionInfo, setRegionInfoLoading, setRegionInfoError, setRegionBoundary]);
+
 
   const handleChangeText = useCallback((text: string) => {
     setSuppressSearch(false);
     setQuery(text);
     if (text.trim().length === 0) {
       closeRegionInfo();
+      setRegionBoundary(null);
     }
-  }, [closeRegionInfo]);
+  }, [closeRegionInfo, setRegionBoundary]);
 
   return (
     <View style={[styles.container, style]}>
@@ -135,7 +151,7 @@ export const RegionSearchBar: React.FC<RegionSearchBarProps> = ({ style }) => {
             keyboardShouldPersistTaps="handled"
             data={data}
             keyExtractor={(item) => item.id}
-            renderItem={renderResult}
+            renderItem={({ item }) => <ResultItem item={item} onPress={handleSelect} />}
             ItemSeparatorComponent={() => <View style={styles.separator} />}
           />
         </View>
@@ -144,7 +160,7 @@ export const RegionSearchBar: React.FC<RegionSearchBarProps> = ({ style }) => {
   );
 };
 
-const getDeltasForType = (type: RegionSearchResult['type']) => {
+const getDeltasForType = (type: string) => {
   switch (type) {
     case 'suburb':
       return { latitudeDelta: 0.05, longitudeDelta: 0.05 };
@@ -154,11 +170,12 @@ const getDeltasForType = (type: RegionSearchResult['type']) => {
       return { latitudeDelta: 0.15, longitudeDelta: 0.15 };
     case 'lga':
     default:
-      return { latitudeDelta: 0.35, longitudeDelta: 0.35 };
+      // 更大的delta值 = 更小的缩放级别 = 显示更大的区域，便于查看整个LGA边界
+      return { latitudeDelta: 0.8, longitudeDelta: 0.8 };
   }
 };
 
-const inferMapLevel = (type: RegionSearchResult['type']) => {
+const inferMapLevel = (type: string) => {
   if (type === 'suburb' || type === 'postcode') {
     return 'suburb' as const;
   }
@@ -177,6 +194,44 @@ const formatRegionMeta = (item: RegionSearchResult) => {
   }
   return parts.join(' · ');
 };
+
+/**
+ * Convert GeoJSON geometry to React Native Maps coordinate format
+ * Handles Polygon and MultiPolygon geometries
+ */
+const convertGeoJSONToMapCoordinates = (geometry: any): Array<Array<{ latitude: number; longitude: number }>> => {
+  if (!geometry || !geometry.coordinates) {
+    return [];
+  }
+
+  const convertCoordinatePair = (coord: number[]): { latitude: number; longitude: number } => ({
+    latitude: coord[1],  // GeoJSON is [lng, lat]
+    longitude: coord[0],
+  });
+
+  if (geometry.type === 'Polygon') {
+    // Polygon: coordinates is array of rings, first ring is exterior
+    return geometry.coordinates.map((ring: number[][]) => 
+      ring.map(convertCoordinatePair)
+    );
+  } else if (geometry.type === 'MultiPolygon') {
+    // MultiPolygon: coordinates is array of polygons
+    return geometry.coordinates.flatMap((polygon: number[][][]) =>
+      polygon.map((ring: number[][]) => ring.map(convertCoordinatePair))
+    );
+  }
+
+  return [];
+};
+
+const ResultItem: React.FC<{ item: RegionSearchResult; onPress: (item: RegionSearchResult) => void }> = ({ item, onPress }) => (
+  <TouchableOpacity style={styles.resultItem} onPress={() => onPress(item)}>
+    <View style={styles.resultTextContainer}>
+      <Text style={styles.resultName}>{item.name}</Text>
+      <Text style={styles.resultMeta}>{formatRegionMeta(item)}</Text>
+    </View>
+  </TouchableOpacity>
+);
 
 const styles = StyleSheet.create({
   container: {
