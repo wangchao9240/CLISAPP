@@ -1,15 +1,108 @@
 // Main map screen implementing FR-001 and FR-002
 import React, { useState } from 'react';
-import { StyleSheet, View, StatusBar, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, StatusBar, TouchableOpacity, Image, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { UniversalMap } from '../components/Map/UniversalMap';
+import Geolocation from 'react-native-geolocation-service';
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 import { Legend } from '../components/UI/Legend';
 import { LayerSelector } from '../components/UI/LayerSelector';
 import { RegionSearchBar } from '../components/UI/RegionSearchBar';
+import { useMapStore } from '../store/mapStore';
 
 export const MapScreen: React.FC = () => {
   const [legendVisible, setLegendVisible] = useState(false);
+  const [locating, setLocating] = useState(false);
+  const { setRegion } = useMapStore();
+
+  const requestLocationPermission = async () => {
+    try {
+      const permission = Platform.select({
+        ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+        android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+      });
+
+      if (!permission) {
+        Alert.alert('Error', 'Platform not supported');
+        return false;
+      }
+
+      const result = await check(permission);
+
+      if (result === RESULTS.GRANTED) {
+        return true;
+      }
+
+      if (result === RESULTS.DENIED) {
+        const requestResult = await request(permission);
+        return requestResult === RESULTS.GRANTED;
+      }
+
+      if (result === RESULTS.BLOCKED) {
+        Alert.alert(
+          'Location Permission',
+          'Location permission is blocked. Please enable it in your device settings.',
+          [{ text: 'OK' }]
+        );
+        return false;
+      }
+
+      return false;
+    } catch (error) {
+      console.error('Error requesting location permission:', error);
+      return false;
+    }
+  };
+
+  const handleLocateMe = async () => {
+    if (locating) return;
+
+    setLocating(true);
+
+    try {
+      const hasPermission = await requestLocationPermission();
+      
+      if (!hasPermission) {
+        setLocating(false);
+        return;
+      }
+
+      Geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          
+          // Set the map region to user's location with appropriate zoom
+          setRegion({
+            latitude,
+            longitude,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          });
+
+          setLocating(false);
+        },
+        (error) => {
+          console.error('Location error:', error);
+          Alert.alert(
+            'Location Error',
+            'Unable to get your current location. Please make sure location services are enabled.',
+            [{ text: 'OK' }]
+          );
+          setLocating(false);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 10000,
+        }
+      );
+    } catch (error) {
+      console.error('Error getting location:', error);
+      Alert.alert('Error', 'Failed to get your location');
+      setLocating(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -60,10 +153,14 @@ export const MapScreen: React.FC = () => {
             </View>
 
             {/* Right: Locate Me Button */}
-            <TouchableOpacity style={styles.locateButton}>
+            <TouchableOpacity 
+              style={[styles.locateButton, locating && styles.locateButtonActive]}
+              onPress={handleLocateMe}
+              disabled={locating}
+            >
               <Image 
                 source={require('../assets/img/locate.png')}
-                style={styles.locateIcon}
+                style={[styles.locateIcon, locating && styles.locateIconActive]}
                 resizeMode="contain"
               />
             </TouchableOpacity>
@@ -239,5 +336,13 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     tintColor: '#0A0A0A',
+  },
+  locateButtonActive: {
+    backgroundColor: 'rgba(0, 122, 255, 0.1)',
+    borderColor: 'rgba(0, 122, 255, 0.3)',
+  },
+  locateIconActive: {
+    tintColor: '#007AFF',
+    opacity: 0.7,
   },
 });

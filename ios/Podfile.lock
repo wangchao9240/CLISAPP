@@ -8,6 +8,8 @@ PODS:
   - hermes-engine (0.81.1):
     - hermes-engine/Pre-built (= 0.81.1)
   - hermes-engine/Pre-built (0.81.1)
+  - Permission-LocationWhenInUse (3.10.1):
+    - RNPermissions
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -2616,6 +2618,7 @@ DEPENDENCIES:
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
+  - Permission-LocationWhenInUse (from `/Users/wang/Documents/qut/current_semester/IFN735_25se2_Industry_Project/CLISAPP/CLISApp-frontend/node_modules/react-native-permissions/ios/LocationWhenInUse`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
   - RCTRequired (from `../node_modules/react-native/Libraries/Required`)
@@ -2712,6 +2715,8 @@ EXTERNAL SOURCES:
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
     :tag: hermes-2025-07-07-RNv0.81.0-e0fc67142ec0763c6b6153ca2bf96df815539782
+  Permission-LocationWhenInUse:
+    :path: "/Users/wang/Documents/qut/current_semester/IFN735_25se2_Industry_Project/CLISAPP/CLISApp-frontend/node_modules/react-native-permissions/ios/LocationWhenInUse"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTDeprecation:
@@ -2867,7 +2872,8 @@ SPEC CHECKSUMS:
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   hermes-engine: 4f8246b1f6d79f625e0d99472d1f3a71da4d28ca
-  RCT-Folly: 59ec0ac1f2f39672a0c6e6cecdd39383b764646f
+  Permission-LocationWhenInUse: e4a1bdc6b9f4a7a598613a6a748bd186e937df34
+  RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: c4b9e2fd0ab200e3af72b013ed6113187c607077
   RCTRequired: e97dd5dafc1db8094e63bc5031e0371f092ae92a
   RCTTypeSafety: 720403058b7c1380c6a3ae5706981d6362962c89
@@ -2942,6 +2948,6 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 11c9686a21e2cd82a094a723649d9f4507200fb0
 
-PODFILE CHECKSUM: ac4e7447ef807f8b6b36ff1aa9f12bb35658a44b
+PODFILE CHECKSUM: 559662fa7d98f9f7f7ad3275e4cbaf0318d9adf1
 
 COCOAPODS: 1.16.2
