@@ -31,9 +31,22 @@ export const MAP_ZOOM_LEVELS = {
 export const TILE_CONFIG = {
   maximumZ: 12,
   minimumZ: 6,
-  opacity: 0.2, // Reduced opacity for more natural blending with base map
+  // Optimized opacity for smoother gradient blending with base map
+  // Lower opacity (0.5-0.6) creates softer, more natural appearance
+  // Transparent tiles blend better with OSM base layer
+  opacity: 0.55,
   cacheMaxAgeSec: 60 * 60 * 24 * 7, // 7 days
   cacheNamespace: 'clisapp_tile_cache',
+} as const;
+
+// Layer-specific opacity settings for better visualization
+// Different climate layers may benefit from different opacity levels
+export const LAYER_OPACITY = {
+  pm25: 0.6,        // Higher opacity for air quality (more visible)
+  precipitation: 0.5, // Medium opacity for precipitation
+  uv: 0.55,         // Medium-high opacity for UV index
+  humidity: 0.5,    // Medium opacity for humidity
+  temperature: 0.55, // Medium-high opacity for temperature
 } as const;
 
 // OpenStreetMap tile server configuration
