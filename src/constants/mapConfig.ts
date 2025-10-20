@@ -42,11 +42,11 @@ export const TILE_CONFIG = {
 // Layer-specific opacity settings for better visualization
 // Different climate layers may benefit from different opacity levels
 export const LAYER_OPACITY = {
-  pm25: 0.6,        // Higher opacity for air quality (more visible)
-  precipitation: 0.5, // Medium opacity for precipitation
-  uv: 0.55,         // Medium-high opacity for UV index
-  humidity: 0.5,    // Medium opacity for humidity
-  temperature: 0.55, // Medium-high opacity for temperature
+  pm25: 0.2,        // Higher opacity for air quality (more visible)
+  precipitation: 0.2, // Medium opacity for precipitation
+  uv: 0.2,         // Medium-high opacity for UV index
+  humidity: 0.2,    // Medium opacity for humidity
+  temperature: 0.2, // Medium-high opacity for temperature
 } as const;
 
 // OpenStreetMap tile server configuration
