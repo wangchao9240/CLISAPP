@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { CLIMATE_LAYERS } from '../../constants/climateData';
 import { useMapStore } from '../../store/mapStore';
+import { useDynamicThreshold } from '../../hooks/useDynamicThreshold';
 
 interface LegendProps {
   layer?: keyof typeof CLIMATE_LAYERS;
@@ -11,14 +12,22 @@ interface LegendProps {
 export const Legend: React.FC<LegendProps> = ({ layer, style }) => {
   const { activeLayer } = useMapStore();
   const key = (layer ?? activeLayer) as keyof typeof CLIMATE_LAYERS;
+
   const config = CLIMATE_LAYERS[key];
+  const dynamicThresholds = useDynamicThreshold(key === 'precipitation' ? 'precipitation' : 'pm25');
+  const thresholds = useMemo(() => {
+    if ((key === 'pm25' || key === 'precipitation') && dynamicThresholds.length === config.colorScale.length) {
+      return dynamicThresholds;
+    }
+    return config.thresholds;
+  }, [key, dynamicThresholds, config.thresholds, config.colorScale.length]);
 
   return (
     <View style={[styles.container, style]}> 
       <Text style={styles.title}>{config.name}</Text>
       <View style={styles.rows}>
-        {config.thresholds.map((t: number, idx: number) => {
-          const next = config.thresholds[idx + 1];
+        {thresholds.map((t: number, idx: number) => {
+          const next = thresholds[idx + 1];
           const label = next !== undefined ? `${t}–${next} ${config.unit}` : `${t}+ ${config.unit}`;
           const color = config.colorScale[Math.min(idx, config.colorScale.length - 1)];
           return (
