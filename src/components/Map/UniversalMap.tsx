@@ -97,6 +97,10 @@ export const UniversalMap: React.FC<UniversalMapProps> = ({
 
   useEffect(() => {
     mapProviderRef.current?.setTileLayer(activeLayer, mapLevel);
+    if (mapProviderRef.current && 'setMapRef' in mapProviderRef.current) {
+      // Reapply tile layer settings to ensure UrlTile updates
+      mapProviderRef.current.setTileLayer(activeLayer, mapLevel);
+    }
   }, [activeLayer, mapLevel]);
 
   useEffect(() => {

@@ -29,7 +29,7 @@ export const MAP_ZOOM_LEVELS = {
 } as const;
 
 export const TILE_CONFIG = {
-  maximumZ: 12,
+  maximumZ: 13,
   minimumZ: 6,
   opacity: 0.2, // Reduced opacity for more natural blending with base map
   cacheMaxAgeSec: 60 * 60 * 24 * 7, // 7 days

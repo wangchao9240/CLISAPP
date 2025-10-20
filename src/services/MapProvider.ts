@@ -73,7 +73,7 @@ class ReactNativeMapsProvider implements MapProviderInterface {
   }
 
   setTileLayer(layer: ClimateLayer, level: MapLevel): void {
-    this.currentTileUrl = `${this.config.tileServerUrl}/${layer}/${level}/{z}/{x}/{y}.png`;
+    this.currentTileUrl = `${this.config.tileServerUrl}/${layer}/{z}/{x}/{y}.png`;
   }
 
   setTileOpacity(opacity: number): void {
@@ -158,7 +158,7 @@ class MapLibreProvider implements MapProviderInterface {
     // Add new tile source
     this.map?.addSource(sourceId, {
       type: 'raster',
-      tiles: [`${this.config.tileServerUrl}/${layer}/${level}/{z}/{x}/{y}.png`],
+      tiles: [`${this.config.tileServerUrl}/${layer}/{z}/{x}/{y}.png`],
       tileSize: 256,
     });
 
