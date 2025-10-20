@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useMapStore } from '../../store/mapStore';
+import { useFavoritesStore } from '../../store/favoritesStore';
 import { RegionClimateStat } from '../../types/region.types';
-import { CLIMATE_LAYER_ORDER } from '../../constants/climateData';
 
 const formatValue = (stat: RegionClimateStat | null) => {
   if (!stat) return '--';
@@ -10,62 +10,138 @@ const formatValue = (stat: RegionClimateStat | null) => {
   return `${value} ${stat.unit ?? ''}`.trim();
 };
 
+const getCategoryColor = (category?: string): string => {
+  if (!category) return '#6B7280';
+  
+  const lowerCategory = category.toLowerCase();
+  
+  // PM2.5 categories
+  if (lowerCategory.includes('good')) return '#10B981';
+  if (lowerCategory.includes('moderate')) return '#F59E0B';
+  if (lowerCategory.includes('unhealthy for sensitive')) return '#F97316';
+  if (lowerCategory.includes('unhealthy')) return '#EF4444';
+  if (lowerCategory.includes('very unhealthy')) return '#DC2626';
+  if (lowerCategory.includes('hazardous')) return '#7C2D12';
+  
+  // UV Index categories
+  if (lowerCategory.includes('low')) return '#10B981';
+  if (lowerCategory.includes('medium') || lowerCategory.includes('moderate')) return '#F59E0B';
+  if (lowerCategory.includes('high')) return '#F97316';
+  if (lowerCategory.includes('very high')) return '#EF4444';
+  if (lowerCategory.includes('extreme')) return '#DC2626';
+  
+  // Temperature categories
+  if (lowerCategory.includes('cold')) return '#3B82F6';
+  if (lowerCategory.includes('cool')) return '#60A5FA';
+  if (lowerCategory.includes('mild')) return '#10B981';
+  if (lowerCategory.includes('warm')) return '#F59E0B';
+  if (lowerCategory.includes('hot')) return '#EF4444';
+  
+  // Humidity categories
+  if (lowerCategory.includes('dry')) return '#F59E0B';
+  if (lowerCategory.includes('comfortable')) return '#10B981';
+  if (lowerCategory.includes('humid')) return '#3B82F6';
+  
+  // Precipitation categories
+  if (lowerCategory.includes('none') || lowerCategory.includes('no rain')) return '#6B7280';
+  if (lowerCategory.includes('light')) return '#60A5FA';
+  if (lowerCategory.includes('moderate')) return '#3B82F6';
+  if (lowerCategory.includes('heavy')) return '#1E40AF';
+  
+  return '#6B7280';
+};
+
 export const RegionInfoPanel: React.FC = () => {
   const { regionInfo, closeRegionInfo } = useMapStore();
+  const { addFavorite, isFavorite, removeFavorite } = useFavoritesStore();
 
   if (!regionInfo.visible) {
     return null;
   }
 
-  const { regionName, regionType, climate, loading, error } = regionInfo;
+  const { regionId, regionName, regionType, climate, loading, error } = regionInfo;
   const primary = climate?.primary ?? null;
-  const secondary = CLIMATE_LAYER_ORDER
-    .filter((layer) => climate?.secondary.some((item) => item.layer === layer))
-    .map((layer) => climate?.secondary.find((item) => item.layer === layer)!)
-    .filter(Boolean);
+  const isMarked = regionId ? isFavorite(regionId) : false;
+
+  const handleMarkLocation = () => {
+    if (!regionId || !regionName || !regionType) return;
+
+    if (isMarked) {
+      removeFavorite(regionId);
+      return;
+    }
+
+    addFavorite({
+      regionId,
+      regionName,
+      regionType,
+      timestamp: new Date().toISOString(),
+    });
+
+  };
+
+  const categoryColor = getCategoryColor(primary?.category);
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View>
+        <View style={styles.headerLeft}>
           <Text style={styles.regionName}>{regionName}</Text>
           <Text style={styles.regionMeta}>{regionType === 'suburb' ? 'Suburb' : 'LGA'}</Text>
         </View>
-        <TouchableOpacity style={styles.closeButton} onPress={closeRegionInfo}>
-          <Text style={styles.closeText}>×</Text>
-        </TouchableOpacity>
+        <View style={styles.headerRight}>
+          <TouchableOpacity 
+            style={[styles.markButton, isMarked && styles.markButtonActive]}
+            onPress={handleMarkLocation}
+          >
+            <Text style={[styles.markIcon, isMarked && styles.markIconActive]}>
+              {isMarked ? '★' : '☆'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.closeButton} onPress={closeRegionInfo}>
+            <Text style={styles.closeText}>×</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
+      {/* Primary climate data - matches Figma prototype */}
       <View style={styles.primaryBlock}>
         <Text style={styles.primaryTitle}>{primary?.name ?? 'Environmental Data'}</Text>
-        <Text style={styles.primaryValue}>{formatValue(primary)}</Text>
-        {primary?.category && <Text style={styles.primaryCategory}>{primary.category}</Text>}
+        <View style={styles.primaryValueRow}>
+          <Text style={styles.primaryValue}>{formatValue(primary)}</Text>
+          {primary?.category && (
+            <View style={[styles.categoryBadge, { backgroundColor: `${categoryColor}15` }]}>
+              <Text style={[styles.categoryText, { color: categoryColor }]}>
+                {primary.category}
+              </Text>
+            </View>
+          )}
+        </View>
+        {primary?.description && (
+          <Text style={styles.primaryDescription}>{primary.description}</Text>
+        )}
       </View>
 
-      <ScrollView horizontal contentContainerStyle={styles.secondaryGrid} showsHorizontalScrollIndicator={false}>
-        {loading && (
-          <View style={styles.secondaryItem}>
-            <View style={styles.skeletonTitle} />
-            <View style={styles.skeletonValue} />
-          </View>
-        )}
-        {!loading && secondary.map((item) => (
-          <View key={item.layer} style={styles.secondaryItem}>
-            <Text style={styles.secondaryTitle}>{item.name}</Text>
-            <Text style={styles.secondaryValue}>{formatValue(item)}</Text>
-            {item.category && <Text style={styles.secondaryCategory}>{item.category}</Text>}
-          </View>
-        ))}
-        {secondary.length === 0 && !loading && !error && (
-          <Text style={styles.emptyHint}>No additional data available</Text>
-        )}
-      </ScrollView>
+      {/* Loading state */}
+      {loading && (
+        <View style={styles.loadingBlock}>
+          <View style={styles.skeletonTitle} />
+          <View style={styles.skeletonValue} />
+        </View>
+      )}
 
+      {/* Footer with timestamp */}
       <View style={styles.footer}>
-        {loading && <Text style={styles.statusText}>Loading region information...</Text>}
         {!loading && error && <Text style={styles.errorText}>{error}</Text>}
         {!loading && !error && primary?.lastUpdated && (
-          <Text style={styles.statusText}>Data time: {new Date(primary.lastUpdated).toLocaleString()}</Text>
+          <Text style={styles.timestampText}>
+            Updated: {new Date(primary.lastUpdated).toLocaleString('en-AU', {
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </Text>
         )}
       </View>
     </View>
@@ -94,111 +170,137 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
+    alignItems: 'flex-start',
+    marginBottom: 16,
+  },
+  headerLeft: {
+    flex: 1,
+  },
+  headerRight: {
+    flexDirection: 'row',
+    gap: 8,
   },
   regionName: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
-    color: '#1F2937',
+    color: '#111827',
+    letterSpacing: -0.4,
   },
   regionMeta: {
     marginTop: 4,
-    fontSize: 12,
+    fontSize: 13,
+    fontWeight: '500',
     color: '#6B7280',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
-  closeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+  markButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.08)',
+    backgroundColor: 'rgba(0,0,0,0.04)',
+  },
+  markButtonActive: {
+    backgroundColor: 'rgba(251, 191, 36, 0.15)',
+  },
+  markIcon: {
+    fontSize: 20,
+    color: '#9CA3AF',
+  },
+  markIconActive: {
+    color: '#F59E0B',
+  },
+  closeButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.04)',
   },
   closeText: {
-    fontSize: 20,
-    color: '#111827',
+    fontSize: 24,
+    color: '#6B7280',
     marginTop: -2,
   },
   primaryBlock: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#F9FAFB',
     borderRadius: 16,
-    paddingVertical: 16,
-    paddingHorizontal: 18,
-    marginBottom: 12,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.04)',
   },
   primaryTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
-    color: '#4B5563',
-    marginBottom: 6,
-  },
-  primaryValue: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  primaryCategory: {
-    marginTop: 6,
-    fontSize: 12,
-    color: '#2563EB',
-  },
-  secondaryGrid: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  secondaryItem: {
-    width: 130,
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    marginRight: 12,
-  },
-  secondaryTitle: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 6,
-  },
-  secondaryValue: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  secondaryCategory: {
-    marginTop: 4,
-    fontSize: 11,
-    color: '#2563EB',
-  },
-  emptyHint: {
-    fontSize: 12,
-    color: '#9CA3AF',
-    alignSelf: 'center',
-    marginTop: 16,
-  },
-  footer: {
-    marginTop: 18,
-  },
-  statusText: {
-    fontSize: 12,
     color: '#6B7280',
+    marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
-  errorText: {
-    fontSize: 12,
-    color: '#DC2626',
-  },
-  skeletonTitle: {
-    width: 80,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: 'rgba(0,0,0,0.1)',
+  primaryValueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
     marginBottom: 8,
   },
-  skeletonValue: {
-    width: 60,
-    height: 18,
-    borderRadius: 6,
+  primaryValue: {
+    fontSize: 36,
+    fontWeight: '700',
+    color: '#111827',
+    letterSpacing: -1,
+  },
+  categoryBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  categoryText: {
+    fontSize: 13,
+    fontWeight: '600',
+    letterSpacing: 0.2,
+  },
+  primaryDescription: {
+    fontSize: 13,
+    color: '#6B7280',
+    lineHeight: 18,
+    marginTop: 4,
+  },
+  loadingBlock: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 16,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    marginBottom: 16,
+  },
+  skeletonTitle: {
+    width: 120,
+    height: 14,
+    borderRadius: 7,
     backgroundColor: 'rgba(0,0,0,0.08)',
+    marginBottom: 12,
+  },
+  skeletonValue: {
+    width: 160,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: 'rgba(0,0,0,0.06)',
+  },
+  footer: {
+    paddingTop: 4,
+  },
+  timestampText: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    fontWeight: '500',
+  },
+  errorText: {
+    fontSize: 13,
+    color: '#DC2626',
+    fontWeight: '500',
   },
 });

@@ -9,7 +9,7 @@ import MapView, { UrlTile, LatLng, Region as RNRegion, Polygon } from 'react-nat
 import { useMapStore } from '../../store/mapStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { Region } from '../../types/map.types';
-import { TILE_CONFIG, DEFAULT_OSM_TILE_SERVER, QUEENSLAND_BOUNDS } from '../../constants/mapConfig';
+import { TILE_CONFIG, LAYER_OPACITY, DEFAULT_OSM_TILE_SERVER, QUEENSLAND_BOUNDS } from '../../constants/mapConfig';
 import { Region as MapRegion } from '../../types/map.types';
 import { MapProviderInterface } from '../../services/MapProvider';
 import { fetchRegionInfoByCoordinates, formatClimateOverview } from '../../hooks/useApi';
@@ -67,6 +67,10 @@ export const OpenStreetMap: React.FC<OpenStreetMapProps> = ({
   }, [openRegionInfo, setRegionInfoLoading, setRegionInfoError, setSelectedRegion]);
 
   const climateTileUrl = `${tileServerUrl}/${activeLayer}/{z}/{x}/{y}.png`;
+  
+  // Get layer-specific opacity for smoother blending
+  // Each climate layer has optimized opacity for best visualization
+  const tileOpacity = LAYER_OPACITY[activeLayer] || TILE_CONFIG.opacity;
 
   useEffect(() => {
     setLoading(true);
@@ -138,7 +142,7 @@ export const OpenStreetMap: React.FC<OpenStreetMapProps> = ({
           maximumZ={TILE_CONFIG.maximumZ}
           minimumZ={TILE_CONFIG.minimumZ}
           flipY={false}
-          opacity={TILE_CONFIG.opacity}
+          opacity={tileOpacity}
           zIndex={2}
         />
         {regionBoundary && regionBoundary.coordinates.map((polygon, idx) => (
