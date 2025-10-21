@@ -13,6 +13,7 @@ import { TILE_CONFIG, LAYER_OPACITY, DEFAULT_OSM_TILE_SERVER, QUEENSLAND_BOUNDS 
 import { Region as MapRegion } from '../../types/map.types';
 import { MapProviderInterface } from '../../services/MapProvider';
 import { fetchRegionInfoByCoordinates, formatClimateOverview } from '../../hooks/useApi';
+import useBoundaryOverlays from '../../hooks/useBoundaryOverlays';
 
 interface OpenStreetMapProps {
   onRegionChange?: (region: Region) => void;
@@ -109,6 +110,8 @@ export const OpenStreetMap: React.FC<OpenStreetMapProps> = ({
     }
   }, [providerRef, handleMapLongPress]);
 
+  const boundaryOverlays = useBoundaryOverlays();
+
   return (
     <View style={[styles.container, style]}>
       <MapView
@@ -145,6 +148,17 @@ export const OpenStreetMap: React.FC<OpenStreetMapProps> = ({
           opacity={tileOpacity}
           zIndex={2}
         />
+        {boundaryOverlays.map((overlay) => (
+          <Polygon
+            key={`${overlay.id}-${overlay.zIndex}-${overlay.coordinates.length}`}
+            coordinates={overlay.coordinates}
+            holes={overlay.holes}
+            strokeColor={overlay.strokeColor}
+            strokeWidth={overlay.strokeWidth}
+            fillColor="rgba(0,0,0,0)"
+            zIndex={overlay.zIndex}
+          />
+        ))}
         {regionBoundary && regionBoundary.coordinates.map((polygon, idx) => (
           <Polygon
             key={`${regionBoundary.regionId}-${idx}`}
