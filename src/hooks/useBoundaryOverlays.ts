@@ -14,9 +14,12 @@ export interface MapPolygonOverlay {
   zIndex: number;
 }
 
-const LGA_STROKE = 'rgba(96, 96, 96, 1)';
-const SUBURB_STROKE = 'rgba(128, 128, 128, 0.9)';
+const LGA_STROKE = 'rgba(96, 96, 96, 0.45)';
+const SUBURB_STROKE = 'rgba(128, 128, 128, 0.55)';
 const SUBURB_ZOOM_THRESHOLD = 9;
+const LGA_BASE_WIDTH = 1;
+const LGA_ACTIVE_WIDTH = 1.4;
+const SUBURB_WIDTH = 0.8;
 
 const getZoomLevel = (region: Region): number => {
   const z = Math.log2(360 / region.latitudeDelta);
@@ -64,7 +67,7 @@ const useBoundaryOverlays = () => {
 
     if (zoom < SUBURB_ZOOM_THRESHOLD) {
       const lgaOverlays = lgaFeatures.flatMap((feature) =>
-        buildPolygonOverlays(feature, LGA_STROKE, 1.5, 2)
+        buildPolygonOverlays(feature, LGA_STROKE, LGA_BASE_WIDTH, 2)
       );
       setActiveLga(null);
       setOverlays(lgaOverlays);
@@ -107,10 +110,10 @@ const useBoundaryOverlays = () => {
 
     const suburbFeatures = loadSuburbsForLga(containing.id);
     const suburbOverlays = suburbFeatures.flatMap((suburb) =>
-      buildPolygonOverlays(suburb, SUBURB_STROKE, 1, 3)
+      buildPolygonOverlays(suburb, SUBURB_STROKE, SUBURB_WIDTH, 3)
     );
 
-    const containingOverlays = buildPolygonOverlays(containing, LGA_STROKE, 1.8, 4);
+    const containingOverlays = buildPolygonOverlays(containing, LGA_STROKE, LGA_ACTIVE_WIDTH, 4);
 
     setActiveLga(containing);
     setOverlays([...containingOverlays, ...suburbOverlays]);
