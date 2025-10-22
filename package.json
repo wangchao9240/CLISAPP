@@ -5,6 +5,7 @@
   "scripts": {
     "android": "react-native run-android",
     "ios": "npx react-native run-ios --simulator=\"iPhone 16 Pro\"",
+    "device": "npx react-native run-ios --device",
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest"

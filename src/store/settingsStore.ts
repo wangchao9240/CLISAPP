@@ -2,6 +2,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_CONFIG } from '../constants/apiEndpoints';
 
 interface SettingsState {
   // User preferences
@@ -40,7 +41,7 @@ const defaultSettings = {
   maxCacheSize: 100, // 100MB
   mapProvider: 'react-native-maps' as const,
   baseTileProvider: 'openstreetmap' as const,
-  tileServerUrl: __DEV__ ? 'http://localhost:8000/tiles' : 'https://clisapp-api.qut.edu.au/api/v1/tiles',
+  tileServerUrl: API_CONFIG.TILE_SERVER_URL,
   apiTimeout: 10000, // 10 seconds
 };
 
@@ -49,7 +50,7 @@ export const useSettingsStore = create<SettingsState>()(
     (set) => ({
       ...defaultSettings,
 
-      setDarkMode: (enabled) => set({ isDarkMode: enabled }),
+      setDarkMode: (_enabled) => set({ isDarkMode: false }),
       setLocationServices: (enabled) => set({ enableLocationServices: enabled }),
       setCacheEnabled: (enabled) => set({ cacheEnabled: enabled }),
       setMaxCacheSize: (size) => set({ maxCacheSize: size }),
@@ -63,7 +64,7 @@ export const useSettingsStore = create<SettingsState>()(
       name: 'clisapp-settings',
       storage: createJSONStorage(() => AsyncStorage),
       version: SETTINGS_VERSION,
-      migrate: (persistedState: any, version: number) => {
+      migrate: (persistedState: any, _version: number) => {
         // If stored version is older than current, reset to defaults
         if (!persistedState || persistedState._version < SETTINGS_VERSION) {
           console.log('Settings version outdated, resetting to defaults');
