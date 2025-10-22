@@ -1,15 +1,48 @@
 // API endpoints and environment configuration
+import { Platform } from 'react-native';
+
 const isDevelopment = __DEV__;
+
+/**
+ * Get the local development base URL based on platform
+ * - iOS Simulator: localhost works fine
+ * - Android Emulator: must use 10.0.2.2 to access host machine
+ * - Physical devices: use your Mac's local network IP (e.g., 192.168.0.97)
+ */
+const getLocalBaseUrl = (): string => {
+  if (Platform.OS === 'android') {
+    // Android emulator special IP to access host
+    return 'http://10.0.2.2:8080';
+    
+    // For physical Android device, uncomment and use your Mac's IP:
+    // return 'http://192.168.0.97:8080';
+  }
+  
+  // iOS simulator can use localhost
+  return 'http://localhost:8080';
+  
+  // For physical iOS device, uncomment and use your Mac's IP:
+  // return 'http://192.168.0.97:8080';
+};
+
+const getLocalTileServerUrl = (): string => {
+  if (Platform.OS === 'android') {
+    return 'http://10.0.2.2:8000/tiles';
+    // For physical device: 'http://192.168.0.97:8000/tiles';
+  }
+  return 'http://localhost:8000/tiles';
+  // For physical device: 'http://192.168.0.97:8000/tiles';
+};
 
 export const API_CONFIG = {
   // Backend base URL
   BASE_URL: isDevelopment 
-    ? 'http://192.168.0.97:8080'
+    ? getLocalBaseUrl()
     : 'https://clisapp-api.qut.edu.au',
     
   // Tile server configuration (using Phase 0 tile server)
   TILE_SERVER_URL: isDevelopment 
-    ? 'http://192.168.0.97:8000/tiles'
+    ? getLocalTileServerUrl()
     : 'https://clisapp-api.qut.edu.au/api/v1/tiles',
     
   // API timeouts
