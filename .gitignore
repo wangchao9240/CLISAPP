@@ -78,3 +78,7 @@ yarn-error.log
 src/assets/geodata/geodata.geojson
 src/assets/geodata/geodata.json
 
+# Environment variables (contains sensitive API keys)
+.env
+.env.local
+.env.*.local

@@ -1,5 +1,6 @@
 // API endpoints and environment configuration
 import { Platform } from 'react-native';
+import Config from 'react-native-config';
 
 const isDevelopment = __DEV__;
 
@@ -56,8 +57,8 @@ export const API_CONFIG = {
   LOG_LEVEL: isDevelopment ? 'debug' : 'error',
 } as const;
 
-// Google Maps API key (should be set in native configuration)
-export const GOOGLE_MAPS_API_KEY = 'your_google_maps_api_key_here';
+// Google Maps API key (loaded from .env file via react-native-config)
+export const GOOGLE_MAPS_API_KEY = Config.GOOGLE_MAPS_API_KEY || '';
 
 // Backend API endpoints (Phase 0 tile server)
 export const API_ENDPOINTS = {
