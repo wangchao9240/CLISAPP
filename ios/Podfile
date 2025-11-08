@@ -14,7 +14,7 @@ def setup_permissions(options)
   end
 end
 
-platform :ios, min_ios_version_supported
+platform :ios, '15.1'
 prepare_react_native_project!
 
 linkage = ENV['USE_FRAMEWORKS']
